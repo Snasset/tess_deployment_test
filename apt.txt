@@ -1,3 +1,8 @@
 tesseract-ocr
 tesseract-ocr-eng
 tesseract-ocr-ind
+ldconfig
+echo "--- Tesseract Installation Check ---"
+which tesseract
+ls -l /usr/bin/tesseract
+echo "--- End Tesseract Check ---"
