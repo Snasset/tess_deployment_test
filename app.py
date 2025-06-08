@@ -90,7 +90,7 @@ if uploaded_file is not None:
             # OCR
             text = pytesseract.image_to_string(
                 crop_pil,
-                lang="eng_5k_11ki_custom+eng+ind",
+                lang="/tessdata/eng_5k_11ki_custom.traineddata",
                 config="--oem 1 --psm 6"
             )
             st.markdown(f"**📄 OCR Output #{i+1}:**")
