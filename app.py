@@ -9,7 +9,7 @@ from ultralytics import YOLO
 import platform
 
 # === SETUP ===
-os.environ["TESSDATA_PREFIX"] = os.path.abspath("./tessdata/eng_5k_11ki_custom.traineddata")
+os.environ["TESSDATA_PREFIX"] = os.path.abspath("./tessdata")
 if platform.system() == "Windows":
     pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 else:
