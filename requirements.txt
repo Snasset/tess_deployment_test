@@ -1,6 +1,6 @@
 streamlit
 ultralytics
 pytesseract
-opencv-python
+opencv-python-headless
 pillow
 numpy
