@@ -1,6 +1,8 @@
 tesseract-ocr
 tesseract-ocr-eng
 tesseract-ocr-ind
+libgl1
+libglib2.0-0
 ldconfig
 echo "--- Tesseract Installation Check ---"
 which tesseract
