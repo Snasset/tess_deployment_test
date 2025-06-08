@@ -3,8 +3,3 @@ tesseract-ocr-eng
 tesseract-ocr-ind
 libgl1
 libglib2.0-0
-ldconfig
-echo "--- Tesseract Installation Check ---"
-which tesseract
-ls -l /usr/bin/tesseract
-echo "--- End Tesseract Check ---"
