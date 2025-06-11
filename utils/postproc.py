@@ -1,23 +1,21 @@
 import re
-from spellchecker import SpellChecker
+from fuzzywuzzy import process
 
 
-spell = SpellChecker(distance=1)
-spell.word_frequency.load_words(["gula", "garam", "lemak", "serat", "protein", "karbohidrat", "energi", "kalsium"])
+custom_dict = ["gula", "garam", "lemak", "serat", "protein", "karbohidrat", "energi", "kalsium"]
 
 def koreksi_teks(text):
     corrected = []
     for word in text.split():
         clean = word.strip(":;,.")
-        if clean.lower() in spell:
+        if clean.lower() in custom_dict:
             corrected.append(word)
         else:
-            corr = spell.correction(clean)
-            if corr is not None:
-                corrected_word = word.replace(clean, corr)
+            corr = process.extractOne(clean, custom_dict)
+            if corr: 
+                corrected_word = corr[0]
                 corrected.append(corrected_word)
-            else:
-                corrected.append(word)  
+                
     return " ".join(corrected)
 
 def ekstrak_nutrisi(text):

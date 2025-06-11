@@ -10,52 +10,38 @@ from ultralytics import YOLO
 from utils.preproc import preprocess
 from utils.postproc import ekstrak_nutrisi, konversi_ke_100g, cek_kesehatan_bpom, koreksi_teks
 
-# SETUP
+# SETUP TESSERACT
 os.environ["TESSDATA_PREFIX"] = os.path.abspath("./tess_trainneddata")
 if platform.system() == "Windows":
     pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 else:
     pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"
 
+# Load model YOLO
 model = YOLO("tabledet_model/best.pt")
 
 st.title("🍽️ Ekstraksi & Evaluasi Nutrisi")
 
-# Main
+# Step 1: Input Kategori & Takaran
 st.subheader("1️⃣ Informasi Produk")
-
 kategori_pilihan = st.selectbox("📦 Pilih Kategori Produk", [
-    "Minuman Siap Konsumsi",
-    "Pasta & Mi Instan",
-    "Susu Bubuk Plain",
-    "Susu Bubuk Rasa",
-    "Keju",
-    "Yogurt Plain",
-    "Yogurt Rasa",
-    "Serbuk Minuman Sereal",
-    "Oatmeal",
-    "Sereal Siap Santap (Flake/Keping)",
-    "Sereal Batang (Bar)",
-    "Granola",
-    "Biskuit dan Kukis",
-    "Roti dan Produk Roti",
-    "Kue (Kue Kering dan Lembut)",
-    "Puding Siap Santap",
-    "Sambal",
-    "Kecap Manis",
-    "Makanan Ringan Siap Santap"
+    "Minuman Siap Konsumsi", "Pasta & Mi Instan", "Susu Bubuk Plain", "Susu Bubuk Rasa",
+    "Keju", "Yogurt Plain", "Yogurt Rasa", "Serbuk Minuman Sereal", "Oatmeal",
+    "Sereal Siap Santap (Flake/Keping)", "Sereal Batang (Bar)", "Granola",
+    "Biskuit dan Kukis", "Roti dan Produk Roti", "Kue (Kue Kering dan Lembut)",
+    "Puding Siap Santap", "Sambal", "Kecap Manis", "Makanan Ringan Siap Santap"
 ])
 
 takaran = st.number_input("📏 Masukkan Takaran Saji (g/ml)", min_value=1.0, step=1.0)
 
-
+# Step 2: Upload Gambar
 st.subheader("2️⃣ Upload Gambar Label Nutrisi")
 uploaded_file = st.file_uploader("📤 Upload Gambar", type=["jpg", "png", "jpeg"])
 
-
+# Step 3: Proses Deteksi Tabel & OCR (hanya jika tombol ditekan)
 if uploaded_file and st.button("🔍 Cek Nutrisi"):
     image = Image.open(uploaded_file).convert("RGB")
-    st.image(image, caption="📷 Gambar yang Diunggah", use_column_width=True)
+    st.session_state["image"] = image
 
     img_np = np.array(image)
     img_bgr = cv2.cvtColor(img_np, cv2.COLOR_RGB2BGR)
@@ -73,44 +59,42 @@ if uploaded_file and st.button("🔍 Cek Nutrisi"):
             crop_pil_raw = Image.fromarray(crop)
             crop_pil = preprocess(crop_pil_raw)
 
-            st.image(crop_pil, caption="🧾 Tabel Nutrisi Terdeteksi", width=350)
-
-            text = pytesseract.image_to_string(
-                crop_pil,
-                lang="model_50k_custom",
-                config="--oem 1 --psm 6"
+            st.session_state["crop_image"] = crop_pil
+            st.session_state["ocr_raw"] = pytesseract.image_to_string(
+                crop_pil, lang="model_50k_custom", config="--oem 1 --psm 6"
             )
-            text_koreksi = koreksi_teks(text)
-            
-
-            st.markdown("**📄 OCR Output:**")
-            st.code(text_koreksi.strip())
-
-            nutrisi = ekstrak_nutrisi(text_koreksi)
-
-            st.markdown("### 📊 Data Nutrisi Terdeteksi:")
-            nutrisi_spellcheck = {}
-
-            for label, val in nutrisi.items():
-                col1, col2 = st.columns([1, 2])
-                with col1:
-                    st.markdown(f"**{label}**")
-                with col2:
-                    user_val = st.text_input(f"Nilai untuk {label}", value=val, key=f"input_{label}")
-                    nutrisi_spellcheck[label] = user_val
-
-            nutrisi_normalized = konversi_ke_100g(nutrisi_spellcheck, takaran)
-
-            hasil_evaluasi = cek_kesehatan_bpom(kategori_pilihan, nutrisi_normalized)
-
-            st.markdown("### ✅ Evaluasi BPOM:")
-            for hasil in hasil_evaluasi:
-                if "⚠️" in hasil:
-                    st.warning(hasil)
-                elif "✅" in hasil:
-                    st.success(hasil)
-                else:
-                    st.info(hasil)
-
+            st.session_state["ocr_text"] = koreksi_teks(st.session_state["ocr_raw"])
+            st.session_state["nutrisi"] = ekstrak_nutrisi(st.session_state["ocr_text"])
         else:
-            st.error("Tidak ada tabel nutrisi terdeteksi oleh model.")
+            st.error("❌ Tidak ada tabel nutrisi terdeteksi oleh model.")
+            st.stop()
+
+# Step 4: Tampilkan OCR & Koreksi User (jika sudah ada hasil)
+if "nutrisi" in st.session_state:
+    st.subheader("3️⃣ Koreksi Data Nutrisi (Jika Diperlukan)")
+
+    st.image(st.session_state["image"], caption="📷 Gambar yang Diunggah", use_column_width=True)
+    st.image(st.session_state["crop_image"], caption="🧾 Tabel Nutrisi Terdeteksi", width=350)
+
+    st.markdown("**📄 Hasil OCR yang Dikoreksi:**")
+    st.code(st.session_state["ocr_text"])
+
+    nutrisi_input = {}
+
+    with st.form("form_koreksi"):
+        for label, val in st.session_state["nutrisi"].items():
+            nutrisi_input[label] = st.text_input(f"{label}", value=val, key=f"input_{label}")
+        submit = st.form_submit_button("✅ Evaluasi Ulang")
+
+    if submit:
+        nutrisi_normalized = konversi_ke_100g(nutrisi_input, takaran)
+        hasil_evaluasi = cek_kesehatan_bpom(kategori_pilihan, nutrisi_normalized)
+
+        st.subheader("4️⃣ Hasil Evaluasi BPOM")
+        for hasil in hasil_evaluasi:
+            if "⚠️" in hasil:
+                st.warning(hasil)
+            elif "✅" in hasil:
+                st.success(hasil)
+            else:
+                st.info(hasil)
