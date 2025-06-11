@@ -33,6 +33,7 @@ def ekstrak_nutrisi(text):
     cleaned_text = text.lower().replace(",", ".")  
 
     targets = {
+        "Takaran Saji": [r"takaran saji"],
         "Energi": [r"energi(?:\s*total)?"],
         "Lemak": [r"lemak(?:\s*total)?"],
         "Gula": [r"gula(?:\s*total)?"],
