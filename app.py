@@ -32,7 +32,7 @@ kategori_pilihan = st.selectbox("📦 Pilih Kategori Produk", [
     "Puding Siap Santap", "Sambal", "Kecap Manis", "Makanan Ringan Siap Santap"
 ])
 
-takaran = st.number_input("📏 Masukkan Takaran Saji (g/ml)", min_value=1.0, step=1.0)
+# takaran = st.number_input("📏 Masukkan Takaran Saji (g/ml)", min_value=1.0, step=1.0)
 
 # Step 2: Upload Gambar
 st.subheader("2️⃣ Upload Gambar Label Nutrisi")
@@ -63,8 +63,8 @@ if uploaded_file and st.button("🔍 Cek Nutrisi"):
             st.session_state["ocr_raw"] = pytesseract.image_to_string(
                 crop_pil, lang="model_50k_custom", config="--oem 1 --psm 6"
             )
-            st.session_state["ocr_text"] = koreksi_teks(st.session_state["ocr_raw"])
-            st.session_state["nutrisi"] = ekstrak_nutrisi(st.session_state["ocr_text"])
+            # st.session_state["ocr_text"] = koreksi_teks(st.session_state["ocr_raw"])
+            st.session_state["nutrisi"] = ekstrak_nutrisi(st.session_state["ocr_raw"])
         else:
             st.error("❌ Tidak ada tabel nutrisi terdeteksi oleh model.")
             st.stop()
@@ -82,6 +82,7 @@ if "nutrisi" in st.session_state:
     nutrisi_input = {}
 
     label_nutrisi_fix = [
+        "Takaran Saji",
         "Energi",
         "Lemak",
         "Gula",
@@ -100,7 +101,12 @@ if "nutrisi" in st.session_state:
         submit = st.form_submit_button("✅ Evaluasi")
 
     if submit:
-        nutrisi_normalized = konversi_ke_100g(nutrisi_input, takaran)
+        try:
+            takaran_input = float(nutrisi_input["Takaran Saji"])
+        except (ValueError, TypeError):
+            st.error("❌ Takaran Saji harus berupa angka.")
+            st.stop()
+        nutrisi_normalized = konversi_ke_100g(nutrisi_input, takaran_input)
         hasil_evaluasi = cek_kesehatan_bpom(kategori_pilihan, nutrisi_normalized)
 
         st.subheader("4️⃣ Hasil Evaluasi BPOM")
