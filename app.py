@@ -10,7 +10,7 @@ from ultralytics import YOLO
 from utils.preproc import preprocess
 from utils.postproc import ekstrak_nutrisi, konversi_ke_100g, cek_kesehatan_bpom
 
-# === SETUP ===
+# SETUP
 os.environ["TESSDATA_PREFIX"] = os.path.abspath("./tess_trainneddata")
 if platform.system() == "Windows":
     pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
@@ -21,7 +21,7 @@ model = YOLO("tabledet_model/best.pt")
 
 st.title("🍽️ Ekstraksi & Evaluasi Nutrisi")
 
-# STEP 1: INPUT KATEGORI & TAKARAN
+# Main
 st.subheader("1️⃣ Informasi Produk")
 
 kategori_pilihan = st.selectbox("📦 Pilih Kategori Produk", [
@@ -48,11 +48,11 @@ kategori_pilihan = st.selectbox("📦 Pilih Kategori Produk", [
 
 takaran = st.number_input("📏 Masukkan Takaran Saji (g/ml)", min_value=1.0, step=1.0)
 
-# STEP 2: UPLOAD GAMBAR
+
 st.subheader("2️⃣ Upload Gambar Label Nutrisi")
 uploaded_file = st.file_uploader("📤 Upload Gambar", type=["jpg", "png", "jpeg"])
 
-# STEP 3: TOMBOL PROSES
+
 if uploaded_file and st.button("🔍 Cek Nutrisi"):
     image = Image.open(uploaded_file).convert("RGB")
     st.image(image, caption="📷 Gambar yang Diunggah", use_column_width=True)
@@ -108,4 +108,4 @@ if uploaded_file and st.button("🔍 Cek Nutrisi"):
                     st.info(hasil)
 
         else:
-            st.error("❌ Tidak ada tabel nutrisi terdeteksi oleh model.")
+            st.error("Tidak ada tabel nutrisi terdeteksi oleh model.")
