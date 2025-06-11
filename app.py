@@ -34,21 +34,23 @@ if uploaded_file is not None:
     found = False
 
     for result in results:
-        for i, box in enumerate(result.boxes):
+        if result.boxes is not None and len(result.boxes) > 0:
+            best_box = max(result.boxes, key=lambda b: b.conf[0])
+
             found = True
-            x1, y1, x2, y2 = map(int, box.xyxy[0])
+            x1, y1, x2, y2 = map(int, best_box.xyxy[0])
             crop = img_np[y1:y2, x1:x2]
             crop_pil_raw = Image.fromarray(crop)
             crop_pil = preprocess(crop_pil_raw)
 
-            st.image(crop_pil, caption=f"Cropped #{i+1}", width=300)
+            st.image(crop_pil, caption="🧾 Tabel Nutrisi Terdeteksi", width=350)
 
             text = pytesseract.image_to_string(
                 crop_pil,
                 lang="model_50k_custom",
-                config="--oem 1 --psm 6 -c classify_bln_numeric_mode=1 -c tessedit_char_whitelist=0123456789.,%mgG"
+                config="--oem 1 --psm 6"
             )
-            st.markdown(f"**📄 OCR Output #{i+1}:**")
+            st.markdown("**📄 OCR Output:**")
             st.code(text.strip())
 
             nutrisi = ekstrak_nutrisi(text)
@@ -68,6 +70,5 @@ if uploaded_file is not None:
                         st.markdown(f"- {w}")
                 else:
                     st.success("✅ Semua nilai sesuai dengan batas BPOM.")
-
-    if not found:
-        st.warning("❌ Tidak ada bagian tabel nutrisi terdeteksi oleh YOLO.")
+        else:
+            st.warning("❌ Tidak ada bagian tabel nutrisi terdeteksi oleh YOLO.")
