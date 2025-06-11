@@ -4,4 +4,4 @@ pytesseract
 opencv-python-headless
 pillow
 numpy
-spellchecker
+pyspellchecker
