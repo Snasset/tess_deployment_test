@@ -5,18 +5,19 @@ from fuzzywuzzy import process
 custom_dict = ["gula", "garam", "lemak", "serat", "protein", "karbohidrat", "energi", "kalsium"]
 
 def koreksi_teks(text):
-    corrected = []
-    for word in text.split():
-        clean = word.strip(":;,.")
-        if clean.lower() in custom_dict:
-            corrected.append(word)
-        else:
-            corr = process.extractOne(clean, custom_dict)
-            if corr: 
-                corrected_word = corr[0]
-                corrected.append(corrected_word)
-                
-    return " ".join(corrected)
+    corrected_lines = []
+    for line in text.splitlines():  # Jaga baris
+        corrected_words = []
+        for word in line.split():
+            clean = word.strip(":;,.")
+            if clean.lower() in custom_dict:
+                corrected_words.append(clean.lower())
+            else:
+                corr = process.extractOne(clean, custom_dict)
+                if corr:
+                    corrected_words.append(corr[0])
+        corrected_lines.append(" ".join(corrected_words))
+    return "\n".join(corrected_lines) 
 
 def ekstrak_nutrisi(text):
     nutrisi = {}

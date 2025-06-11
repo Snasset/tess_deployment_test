@@ -64,14 +64,14 @@ if uploaded_file and st.button("🔍 Cek Nutrisi"):
                 crop_pil, lang="model_50k_custom", config="--oem 1 --psm 6"
             )
             st.session_state["ocr_text"] = koreksi_teks(st.session_state["ocr_raw"])
-            st.session_state["nutrisi"] = ekstrak_nutrisi(st.session_state["ocr_text"])
+            st.session_state["nutrisi"] = ekstrak_nutrisi(st.session_state["ocr_raw"])
         else:
             st.error("❌ Tidak ada tabel nutrisi terdeteksi oleh model.")
             st.stop()
 
 # Step 4: Tampilkan OCR & Koreksi User (jika sudah ada hasil)
 if "nutrisi" in st.session_state:
-    st.subheader("3️⃣ Koreksi Data Nutrisi (Jika Diperlukan)")
+    st.subheader("3️⃣ Data Nutrisi")
 
     st.image(st.session_state["image"], caption="📷 Gambar yang Diunggah", use_column_width=True)
     st.image(st.session_state["crop_image"], caption="🧾 Tabel Nutrisi Terdeteksi", width=350)
