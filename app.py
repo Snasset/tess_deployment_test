@@ -19,7 +19,7 @@ else:
 
 model = YOLO("tabledet_model/best.pt")
 
-st.title("🍽️ YOLOv8 + Custom OCR + Klasifikasi Gizi BPOM")
+st.title("Ekstraksi Nutrisi")
 
 uploaded_file = st.file_uploader("📤 Upload Gambar Label Nutrisi", type=["jpg", "png", "jpeg"])
 
