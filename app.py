@@ -36,14 +36,11 @@ kategori_pilihan = st.selectbox("📦 Pilih Kategori Produk", [
 
 # Step 2: Upload Gambar
 st.subheader("2️⃣ Upload Gambar Label Nutrisi")
-mode_pilihan = st.radio("Pilih Metode Input Gambar", ["Upload", "Kamera"])
 
-if mode_pilihan == "Upload":
-    uploaded_file = st.file_uploader("📤 Upload Gambar", type=["jpg", "jpeg", "png"], key="upload_gambar")
-    image_source = uploaded_file
-else:
-    camera_image = st.camera_input("📷 Ambil Gambar dari Kamera", key="kamera_input")
-    image_source = camera_image
+st.write("Pilih gambar")
+
+uploaded_file = st.file_uploader("📤 Upload Gambar", type=["jpg", "jpeg", "png"], key="upload_gambar")
+image_source = uploaded_file
 
 # Step 3: Proses Deteksi Tabel & OCR (hanya jika tombol ditekan)
 if image_source and st.button("🔍 Cek Nutrisi"):
