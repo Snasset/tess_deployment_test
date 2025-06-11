@@ -38,9 +38,18 @@ kategori_pilihan = st.selectbox("📦 Pilih Kategori Produk", [
 st.subheader("2️⃣ Upload Gambar Label Nutrisi")
 uploaded_file = st.file_uploader("📤 Upload Gambar", type=["jpg", "png", "jpeg"])
 
+col1, col2 = st.columns(2)
+with col1:
+    uploaded_file = st.file_uploader("📤 Upload Gambar", type=["jpg", "png", "jpeg"])
+with col2:
+    camera_image = st.camera_input("📷 Atau Ambil Gambar dengan Kamera")
+
+# Gunakan salah satu input (prioritaskan upload)
+image_source = uploaded_file or camera_image
+
 # Step 3: Proses Deteksi Tabel & OCR (hanya jika tombol ditekan)
-if uploaded_file and st.button("🔍 Cek Nutrisi"):
-    image = Image.open(uploaded_file).convert("RGB")
+if image_source and st.button("🔍 Cek Nutrisi"):
+    image = Image.open(image_source).convert("RGB")
     st.session_state["image"] = image
 
     img_np = np.array(image)
@@ -96,10 +105,16 @@ if "nutrisi" in st.session_state:
     with st.form("form_koreksi"):
         st.markdown("Silakan koreksi nilai nutrisi di bawah jika diperlukan:")
         for label in label_nutrisi_fix:
-            val = st.session_state["nutrisi"].get(label, "-")  
-            nutrisi_input[label] = st.text_input(f"{label}", value=val, key=f"input_{label}")
+            val = st.session_state["nutrisi"].get(label, "-")
+            if label == "Takaran Saji":
+                nutrisi_input[label] = st.text_input(
+                    f"{label}", value=val, key=f"input_{label}",
+                    help="Masukkan angka tanpa satuan (g/ml)"
+                )
+            else:
+                nutrisi_input[label] = st.text_input(f"{label}", value=val, key=f"input_{label}")
         submit = st.form_submit_button("✅ Evaluasi")
-
+        
     if submit:
         try:
             takaran_input = float(nutrisi_input["Takaran Saji"])
