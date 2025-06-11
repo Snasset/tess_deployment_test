@@ -8,7 +8,7 @@ import pytesseract
 from ultralytics import YOLO
 
 from utils.preproc import preprocess
-from utils.postproc import ekstrak_nutrisi, klasifikasi_produk, cek_bpom_sereal_flake
+from utils.postproc import ekstrak_nutrisi, konversi_ke_100g, cek_kesehatan_bpom
 
 # === SETUP ===
 os.environ["TESSDATA_PREFIX"] = os.path.abspath("./tess_trainneddata")
@@ -54,21 +54,35 @@ if uploaded_file is not None:
             st.code(text.strip())
 
             nutrisi = ekstrak_nutrisi(text)
-            kategori = klasifikasi_produk(text)
-            st.success(f"📦 Kategori Produk: **{kategori}**")
 
             st.markdown("### 📊 Data Nutrisi:")
             for k, v in nutrisi.items():
-                unit = "mg" if k == "Garam" else "g"
-                st.write(f"- **{k}**: {v} {unit}")
-
-            if kategori == "Sereal Flake (Ready to Eat)":
-                warning = cek_bpom_sereal_flake(nutrisi)
-                if warning:
-                    st.warning("⚠️ **Peringatan BPOM:**")
-                    for w in warning:
-                        st.markdown(f"- {w}")
-                else:
-                    st.success("✅ Semua nilai sesuai dengan batas BPOM.")
+                st.write(f"- **{k}**: {v}")
+                
         else:
             st.warning("❌ Tidak ada bagian tabel nutrisi terdeteksi oleh YOLO.")
+    kategori_pilihan = st.selectbox(" Pilih Kategori Produk", [
+    "Sereal Flake (Ready to Eat)",
+    "Sereal Batang (Ready to Eat)",
+    "Minuman Siap Konsumsi",
+    "Yogurt Plain",
+    "Yogurt Berperisa",
+    "Susu Bubuk Plain",
+    "Granola",
+    "Olahan Kacang Berlapis",
+    "Pasta/Mie Instan",
+    "Biskuit & Kukis",
+    "Makanan Ringan Siap Santap"
+        ])     
+    takaran = st.number_input("📏 Masukkan Takaran Saji (g/ml)", min_value=1.0, step=1.0)
+    nutrisi_normalized = konversi_ke_100g(nutrisi, takaran)
+
+    # Evaluasi kesesuaian dengan BPOM
+    peringatan = cek_kesehatan_bpom(kategori_pilihan, nutrisi_normalized)
+
+    if peringatan:
+        st.warning("⚠️ **Peringatan:**")
+        for w in peringatan:
+            st.markdown(f"- {w}")
+    else:
+        st.success("✅ Semua nilai sesuai dengan batas BPOM.")
