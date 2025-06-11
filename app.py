@@ -64,7 +64,7 @@ if uploaded_file and st.button("🔍 Cek Nutrisi"):
                 crop_pil, lang="model_50k_custom", config="--oem 1 --psm 6"
             )
             st.session_state["ocr_text"] = koreksi_teks(st.session_state["ocr_raw"])
-            st.session_state["nutrisi"] = ekstrak_nutrisi(st.session_state["ocr_raw"])
+            st.session_state["nutrisi"] = ekstrak_nutrisi(st.session_state["ocr_text"])
         else:
             st.error("❌ Tidak ada tabel nutrisi terdeteksi oleh model.")
             st.stop()
@@ -81,8 +81,21 @@ if "nutrisi" in st.session_state:
 
     nutrisi_input = {}
 
+    label_nutrisi_fix = [
+        "Energi",
+        "Lemak",
+        "Gula",
+        "Serat",
+        "Garam",
+        "Protein",
+        "Karbohidrat",
+        "Kalsium"
+    ]
+
     with st.form("form_koreksi"):
-        for label, val in st.session_state["nutrisi"].items():
+        st.markdown("Silakan koreksi nilai nutrisi di bawah jika diperlukan:")
+        for label in label_nutrisi_fix:
+            val = st.session_state["nutrisi"].get(label, "-")  
             nutrisi_input[label] = st.text_input(f"{label}", value=val, key=f"input_{label}")
         submit = st.form_submit_button("✅ Evaluasi Ulang")
 

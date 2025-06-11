@@ -13,9 +13,11 @@ def koreksi_teks(text):
             if clean.lower() in custom_dict:
                 corrected_words.append(clean.lower())
             else:
-                corr = process.extractOne(clean, custom_dict)
+                corr = process.extractOne(clean, custom_dict, score_cutoff=80)
                 if corr:
                     corrected_words.append(corr[0])
+                else:
+                    corrected_words.append(clean)
         corrected_lines.append(" ".join(corrected_words))
     return "\n".join(corrected_lines) 
 
@@ -24,7 +26,7 @@ def ekstrak_nutrisi(text):
     cleaned_text = text.lower().replace(",", ".")  
 
     targets = {
-        "Energi": [r"energi"],
+        "Energi": [r"energi(?:\s*total)?"],
         "Lemak": [r"lemak(?:\s*total)?"],
         "Gula": [r"gula(?:\s*total)?"],
         "Serat": [r"serat(?:\s*total)?"],
