@@ -6,12 +6,19 @@ custom_dict = ["gula", "garam", "lemak", "serat", "protein", "karbohidrat", "ene
 
 def koreksi_teks(text):
     corrected_lines = []
-    for line in text.splitlines():  # Jaga baris
+    for line in text.splitlines():
         corrected_words = []
         for word in line.split():
-            clean = word.strip(":;,.")
-            if clean.lower() in custom_dict:
-                corrected_words.append(clean.lower())
+            clean = word.strip(":;,.").lower()
+            
+            # Jangan koreksi angka atau satuan
+            if re.fullmatch(r"\d+(\.\d+)?(mg|g|kkal)?", clean) or clean.isdigit():
+                corrected_words.append(clean)
+                continue
+
+            # Biarkan kalau sudah benar
+            if clean in custom_dict:
+                corrected_words.append(clean)
             else:
                 corr = process.extractOne(clean, custom_dict, score_cutoff=80)
                 if corr:
@@ -19,7 +26,7 @@ def koreksi_teks(text):
                 else:
                     corrected_words.append(clean)
         corrected_lines.append(" ".join(corrected_words))
-    return "\n".join(corrected_lines) 
+    return "\n".join(corrected_lines)
 
 def ekstrak_nutrisi(text):
     nutrisi = {}

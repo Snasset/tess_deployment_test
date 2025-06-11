@@ -97,7 +97,7 @@ if "nutrisi" in st.session_state:
         for label in label_nutrisi_fix:
             val = st.session_state["nutrisi"].get(label, "-")  
             nutrisi_input[label] = st.text_input(f"{label}", value=val, key=f"input_{label}")
-        submit = st.form_submit_button("✅ Evaluasi Ulang")
+        submit = st.form_submit_button("✅ Evaluasi")
 
     if submit:
         nutrisi_normalized = konversi_ke_100g(nutrisi_input, takaran)
