@@ -61,11 +61,11 @@ if image_source and st.button("🔍 Cek Nutrisi"):
             x1, y1, x2, y2 = map(int, best_box.xyxy[0])
             crop = img_np[y1:y2, x1:x2]
             crop_pil_raw = Image.fromarray(crop)
-            crop_pil = preprocess(crop_pil_raw)
+            # crop_pil = preprocess(crop_pil_raw)
 
-            st.session_state["crop_image"] = crop_pil
+            st.session_state["crop_image"] = crop_pil_raw
             st.session_state["ocr_raw"] = pytesseract.image_to_string(
-                crop_pil, lang="model_50k_custom", config="--oem 1 --psm 6"
+                crop_pil_raw, lang="model_50k_custom", config="--oem 1 --psm 6"
             )
             # st.session_state["ocr_text"] = koreksi_teks(st.session_state["ocr_raw"])
             st.session_state["nutrisi"] = ekstrak_nutrisi(st.session_state["ocr_raw"])
