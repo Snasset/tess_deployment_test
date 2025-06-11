@@ -19,11 +19,41 @@ else:
 
 model = YOLO("tabledet_model/best.pt")
 
-st.title("Ekstraksi Nutrisi")
+st.title("🍽️ Ekstraksi & Evaluasi Nutrisi")
 
-uploaded_file = st.file_uploader("📤 Upload Gambar Label Nutrisi", type=["jpg", "png", "jpeg"])
+# STEP 1: INPUT KATEGORI & TAKARAN
+st.subheader("1️⃣ Informasi Produk")
 
-if uploaded_file is not None:
+kategori_pilihan = st.selectbox("📦 Pilih Kategori Produk", [
+    "Minuman Siap Konsumsi",
+    "Pasta & Mi Instan",
+    "Susu Bubuk Plain",
+    "Susu Bubuk Rasa",
+    "Keju",
+    "Yogurt Plain",
+    "Yogurt Rasa",
+    "Serbuk Minuman Sereal",
+    "Oatmeal",
+    "Sereal Siap Santap (Flake/Keping)",
+    "Sereal Batang (Bar)",
+    "Granola",
+    "Biskuit dan Kukis",
+    "Roti dan Produk Roti",
+    "Kue (Kue Kering dan Lembut)",
+    "Puding Siap Santap",
+    "Sambal",
+    "Kecap Manis",
+    "Makanan Ringan Siap Santap"
+])
+
+takaran = st.number_input("📏 Masukkan Takaran Saji (g/ml)", min_value=1.0, step=1.0)
+
+# STEP 2: UPLOAD GAMBAR
+st.subheader("2️⃣ Upload Gambar Label Nutrisi")
+uploaded_file = st.file_uploader("📤 Upload Gambar", type=["jpg", "png", "jpeg"])
+
+# STEP 3: TOMBOL PROSES
+if uploaded_file and st.button("🔍 Cek Nutrisi"):
     image = Image.open(uploaded_file).convert("RGB")
     st.image(image, caption="📷 Gambar yang Diunggah", use_column_width=True)
 
@@ -36,8 +66,8 @@ if uploaded_file is not None:
     for result in results:
         if result.boxes is not None and len(result.boxes) > 0:
             best_box = max(result.boxes, key=lambda b: b.conf[0])
-
             found = True
+
             x1, y1, x2, y2 = map(int, best_box.xyxy[0])
             crop = img_np[y1:y2, x1:x2]
             crop_pil_raw = Image.fromarray(crop)
@@ -50,39 +80,32 @@ if uploaded_file is not None:
                 lang="model_50k_custom",
                 config="--oem 1 --psm 6"
             )
+
             st.markdown("**📄 OCR Output:**")
             st.code(text.strip())
 
             nutrisi = ekstrak_nutrisi(text)
 
-            st.markdown("### 📊 Data Nutrisi:")
+            st.markdown("### 📊 Data Nutrisi Terdeteksi:")
             for k, v in nutrisi.items():
                 st.write(f"- **{k}**: {v}")
-                
+
+            nutrisi_normalized = konversi_ke_100g(nutrisi, takaran)
+
+            st.markdown("### 📈 Konversi per 100g/ml:")
+            for k, v in nutrisi_normalized.items():
+                st.write(f"- **{k}**: {v}")
+
+            hasil_evaluasi = cek_kesehatan_bpom(kategori_pilihan, nutrisi_normalized)
+
+            st.markdown("### ✅ Evaluasi BPOM:")
+            for hasil in hasil_evaluasi:
+                if "⚠️" in hasil:
+                    st.warning(hasil)
+                elif "✅" in hasil:
+                    st.success(hasil)
+                else:
+                    st.info(hasil)
+
         else:
-            st.warning("❌ Tidak ada bagian tabel nutrisi terdeteksi oleh YOLO.")
-    kategori_pilihan = st.selectbox(" Pilih Kategori Produk", [
-    "Sereal Flake (Ready to Eat)",
-    "Sereal Batang (Ready to Eat)",
-    "Minuman Siap Konsumsi",
-    "Yogurt Plain",
-    "Yogurt Berperisa",
-    "Susu Bubuk Plain",
-    "Granola",
-    "Olahan Kacang Berlapis",
-    "Pasta/Mie Instan",
-    "Biskuit & Kukis",
-    "Makanan Ringan Siap Santap"
-        ])     
-    takaran = st.number_input("📏 Masukkan Takaran Saji (g/ml)", min_value=1.0, step=1.0)
-    nutrisi_normalized = konversi_ke_100g(nutrisi, takaran)
-
-    # Evaluasi kesesuaian dengan BPOM
-    peringatan = cek_kesehatan_bpom(kategori_pilihan, nutrisi_normalized)
-
-    if peringatan:
-        st.warning("⚠️ **Peringatan:**")
-        for w in peringatan:
-            st.markdown(f"- {w}")
-    else:
-        st.success("✅ Semua nilai sesuai dengan batas BPOM.")
+            st.error("❌ Tidak ada tabel nutrisi terdeteksi oleh model.")
