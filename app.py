@@ -8,7 +8,7 @@ import pytesseract
 from ultralytics import YOLO
 
 from utils.preproc import preprocess
-from utils.postproc import ekstrak_nutrisi, konversi_ke_100g, cek_kesehatan_bpom
+from utils.postproc import ekstrak_nutrisi, konversi_ke_100g, cek_kesehatan_bpom, koreksi_teks
 
 # SETUP
 os.environ["TESSDATA_PREFIX"] = os.path.abspath("./tess_trainneddata")
@@ -80,21 +80,19 @@ if uploaded_file and st.button("🔍 Cek Nutrisi"):
                 lang="model_50k_custom",
                 config="--oem 1 --psm 6"
             )
+            text_koreksi = koreksi_teks(text)
+            
 
             st.markdown("**📄 OCR Output:**")
-            st.code(text.strip())
+            st.code(text_koreksi.strip())
 
-            nutrisi = ekstrak_nutrisi(text)
+            nutrisi = ekstrak_nutrisi(text_koreksi)
 
             st.markdown("### 📊 Data Nutrisi Terdeteksi:")
             for k, v in nutrisi.items():
                 st.write(f"- **{k}**: {v}")
 
             nutrisi_normalized = konversi_ke_100g(nutrisi, takaran)
-
-            st.markdown("### 📈 Konversi per 100g/ml:")
-            for k, v in nutrisi_normalized.items():
-                st.write(f"- **{k}**: {v}")
 
             hasil_evaluasi = cek_kesehatan_bpom(kategori_pilihan, nutrisi_normalized)
 
