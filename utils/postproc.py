@@ -13,12 +13,16 @@ def koreksi_teks(text):
             corrected.append(word)
         else:
             corr = spell.correction(clean)
-            corrected.append(word.replace(clean, corr))  # jaga simbol
+            if corr is not None:
+                corrected_word = word.replace(clean, corr)
+                corrected.append(corrected_word)
+            else:
+                corrected.append(word)  
     return " ".join(corrected)
 
 def ekstrak_nutrisi(text):
     nutrisi = {}
-    cleaned_text = text.lower().replace(",", ".")  # Ubah koma ke titik desimal
+    cleaned_text = text.lower().replace(",", ".")  
 
     targets = {
         "Energi": [r"energi"],
