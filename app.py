@@ -89,10 +89,17 @@ if uploaded_file and st.button("🔍 Cek Nutrisi"):
             nutrisi = ekstrak_nutrisi(text_koreksi)
 
             st.markdown("### 📊 Data Nutrisi Terdeteksi:")
-            for k, v in nutrisi.items():
-                st.write(f"- **{k}**: {v}")
+            nutrisi_spellcheck = {}
 
-            nutrisi_normalized = konversi_ke_100g(nutrisi, takaran)
+            for label, val in nutrisi.items():
+                col1, col2 = st.columns([1, 2])
+                with col1:
+                    st.markdown(f"**{label}**")
+                with col2:
+                    user_val = st.text_input(f"Nilai untuk {label}", value=val, key=f"input_{label}")
+                    nutrisi_spellcheck[label] = user_val
+
+            nutrisi_normalized = konversi_ke_100g(nutrisi_spellcheck, takaran)
 
             hasil_evaluasi = cek_kesehatan_bpom(kategori_pilihan, nutrisi_normalized)
 

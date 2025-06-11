@@ -1,4 +1,20 @@
 import re
+from spellchecker import SpellChecker
+
+
+spell = SpellChecker(distance=1)
+spell.word_frequency.load_words(["gula", "garam", "lemak", "serat", "protein", "karbohidrat", "energi", "kalsium"])
+
+def koreksi_teks(text):
+    corrected = []
+    for word in text.split():
+        clean = word.strip(":;,.")
+        if clean.lower() in spell:
+            corrected.append(word)
+        else:
+            corr = spell.correction(clean)
+            corrected.append(word.replace(clean, corr))  # jaga simbol
+    return " ".join(corrected)
 
 def ekstrak_nutrisi(text):
     nutrisi = {}
@@ -146,7 +162,7 @@ def cek_kesehatan_bpom(kategori, nutrisi_dict):
     hasil = []
 
     if kategori not in batas_bpom:
-        return [f"❓ Kategori **{kategori}** tidak ada dalam referensi BPOM."]
+        return [f"Kategori **{kategori}** tidak ada dalam referensi BPOM."]
 
     batas = batas_bpom[kategori]
 
@@ -186,6 +202,6 @@ def cek_kesehatan_bpom(kategori, nutrisi_dict):
                     )
 
         except Exception:
-            hasil.append(f"❌ Gagal memproses nilai untuk {nutrien}.")
+            hasil.append(f"Gagal memproses nilai untuk {nutrien}.")
 
     return hasil
