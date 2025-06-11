@@ -45,11 +45,6 @@ else:
     camera_image = st.camera_input("📷 Ambil Gambar dari Kamera", key="kamera_input")
     image_source = camera_image
 
-
-
-# Gunakan salah satu input (prioritaskan upload)
-image_source = uploaded_file or camera_image
-
 # Step 3: Proses Deteksi Tabel & OCR (hanya jika tombol ditekan)
 if image_source and st.button("🔍 Cek Nutrisi"):
     image = Image.open(image_source).convert("RGB")
