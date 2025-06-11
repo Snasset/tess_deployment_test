@@ -36,8 +36,6 @@ kategori_pilihan = st.selectbox("📦 Pilih Kategori Produk", [
 
 # Step 2: Upload Gambar
 st.subheader("2️⃣ Upload Gambar Label Nutrisi")
-uploaded_file = st.file_uploader("📤 Upload Gambar", type=["jpg", "png", "jpeg"])
-
 mode_pilihan = st.radio("Pilih Metode Input Gambar", ["Upload", "Kamera"])
 
 if mode_pilihan == "Upload":
@@ -46,6 +44,8 @@ if mode_pilihan == "Upload":
 else:
     camera_image = st.camera_input("📷 Ambil Gambar dari Kamera", key="kamera_input")
     image_source = camera_image
+
+
 
 # Gunakan salah satu input (prioritaskan upload)
 image_source = uploaded_file or camera_image
