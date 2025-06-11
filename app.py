@@ -39,10 +39,12 @@ st.subheader("2️⃣ Upload Gambar Label Nutrisi")
 uploaded_file = st.file_uploader("📤 Upload Gambar", type=["jpg", "png", "jpeg"])
 
 col1, col2 = st.columns(2)
+
 with col1:
-    uploaded_file = st.file_uploader("📤 Upload Gambar", type=["jpg", "png", "jpeg"])
+    uploaded_file = st.file_uploader("📤 Upload Gambar", type=["jpg", "png", "jpeg"], key="upload_gambar")
+
 with col2:
-    camera_image = st.camera_input("📷 Atau Ambil Gambar dengan Kamera")
+    camera_image = st.camera_input("📷 Atau Ambil Gambar dengan Kamera", key="kamera_input")
 
 # Gunakan salah satu input (prioritaskan upload)
 image_source = uploaded_file or camera_image
