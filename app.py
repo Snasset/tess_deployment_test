@@ -84,7 +84,7 @@ if "nutrisi" in st.session_state:
     st.image(st.session_state["crop_image"], caption="🧾 Tabel Nutrisi Terdeteksi", width=350)
 
     st.markdown("**📄 Hasil OCR yang Dikoreksi:**")
-    st.code(st.session_state["ocr_text"])
+    st.code(st.session_state["ocr_raw"])
 
     nutrisi_input = {}
 
