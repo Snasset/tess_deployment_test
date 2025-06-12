@@ -6,8 +6,8 @@ from PIL import Image
 import streamlit as st
 import pytesseract
 from ultralytics import YOLO
-from utils.preproc import preprocess
-from utils.postproc import ekstrak_nutrisi, konversi_ke_100g, cek_kesehatan_bpom, koreksi_teks
+from util_helper.preproc import preprocess
+from util_helper.postproc import ekstrak_nutrisi, konversi_ke_100g, cek_kesehatan_bpom, koreksi_teks
 
 from paddleocr import PaddleOCR
 
