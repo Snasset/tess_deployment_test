@@ -8,7 +8,7 @@ import pytesseract
 from ultralytics import YOLO
 from paddleocr import PaddleOCR
 
-from utils.preproc import preprocess
+# from utils.preproc import preprocess
 from utils.postproc import ekstrak_nutrisi, konversi_ke_100g, cek_kesehatan_bpom, koreksi_teks
 
 # SETUP TESSERACT
