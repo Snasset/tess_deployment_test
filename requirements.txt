@@ -5,3 +5,5 @@ opencv-python-headless
 pillow
 numpy
 fuzzywuzzy
+paddleocr>=2.0.1
+paddlepaddle

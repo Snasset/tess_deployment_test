@@ -6,6 +6,7 @@ from PIL import Image
 import streamlit as st
 import pytesseract
 from ultralytics import YOLO
+from paddleocr import PaddleOCR
 
 from utils.preproc import preprocess
 from utils.postproc import ekstrak_nutrisi, konversi_ke_100g, cek_kesehatan_bpom, koreksi_teks
@@ -19,6 +20,9 @@ else:
 
 # Load model YOLO
 model = YOLO("tabledet_model/best.pt")
+ocr = PaddleOCR(
+    lang='en',
+)
 
 st.title("🍽️ Ekstraksi & Evaluasi Nutrisi")
 
