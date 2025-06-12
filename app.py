@@ -9,7 +9,7 @@ from ultralytics import YOLO
 from util_helper.preproc import preprocess
 from util_helper.postproc import ekstrak_nutrisi, konversi_ke_100g, cek_kesehatan_bpom, koreksi_teks
 
-from paddleocr import PaddleOCR
+# from paddleocr import PaddleOCR
 
 # SETUP TESSERACT
 os.environ["TESSDATA_PREFIX"] = os.path.abspath("./tess_trainneddata")
@@ -20,9 +20,9 @@ else:
 
 # Load model YOLO
 model = YOLO("tabledet_model/best.pt")
-ocr = PaddleOCR(
-    lang='en',
-)
+# ocr = PaddleOCR(
+#     lang='en',
+# )
 
 st.title("🍽️ Ekstraksi & Evaluasi Nutrisi")
 
