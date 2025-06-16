@@ -20,9 +20,7 @@ else:
 
 # Load model YOLO
 model = YOLO("tabledet_model/best.pt")
-ocr = PaddleOCR(
-    lang='en',
-)
+ocr = PaddleOCR(use_angle_cls=False, lang='en')
 
 st.title("🍽️ Ekstraksi & Evaluasi Nutrisi")
 
