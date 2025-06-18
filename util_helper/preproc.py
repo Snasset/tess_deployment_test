@@ -24,7 +24,7 @@ def get_valid_heights(thresh_img, draw_debug=False, debug_name="output_contour_v
 
     return valid_heights
 
-def resize_img(img, target_char_height=32, draw_debug=False):
+def resize_img(img, target_char_height=26, draw_debug=False):
     """
     Resize image agar tinggi huruf (karakter) mendekati target_char_height (misal: 26px).
     """
