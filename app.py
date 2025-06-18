@@ -11,7 +11,13 @@ from util_helper.preproc import resize_img
 import subprocess
 
 # from paddleocr import PaddleOCR
+import pytesseract
+st.write(f"Versi Pytesseract (wrapper): **{pytesseract.__version__}**")
 
+# Untuk mendapatkan versi Tesseract engine (termasuk Leptonica)
+# Ini memerlukan Tesseract terinstal dan dapat diakses di PATH
+result = subprocess.run(['tesseract', '--version'], capture_output=True, text=True, check=True)
+st.code(result.stdout, language='bash')
 # SETUP TESSERACT
 os.environ["TESSDATA_PREFIX"] = os.path.abspath("./tess_trainneddata")
 tessdata_dir = os.path.abspath("./tess_trainneddata")
