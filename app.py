@@ -67,7 +67,7 @@ if image_source and st.button("🔍 Cek Nutrisi"):
             crop_bgr = cv2.cvtColor(crop, cv2.COLOR_RGB2BGR)
 
             # Resize dan simpan ke file temp .tif
-            resized_img = resize_img(crop_bgr, target_char_height=26)
+            resized_img = resize_img(crop_bgr, target_char_height=31)
             temp_path = "processed_tmp.tif"
             Image.fromarray(resized_img).save(temp_path, dpi=(300, 300))
 
