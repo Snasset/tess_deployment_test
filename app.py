@@ -76,6 +76,7 @@ if image_source and st.button("🔍 Cek Nutrisi"):
             cmd = [
                 pytesseract.pytesseract.tesseract_cmd,
                 temp_path,
+                tess_output_txt,
                 "--tessdata-dir", tessdata_dir,
                 "-l", "ind+model_50k_custom",
                 "--dpi", "300",
