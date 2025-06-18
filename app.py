@@ -14,6 +14,7 @@ import subprocess
 
 # SETUP TESSERACT
 os.environ["TESSDATA_PREFIX"] = os.path.abspath("./tess_trainneddata")
+tessdata_dir = os.path.abspath("./tess_trainneddata")
 if platform.system() == "Windows":
     pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 else:
@@ -72,11 +73,11 @@ if image_source and st.button("🔍 Cek Nutrisi"):
 
             # Panggil Tesseract via CLI
             tess_output_txt = "tess_result"
-            lang = "ind+model_50k_custom"
             cmd = [
                 pytesseract.pytesseract.tesseract_cmd,
                 temp_path,
-                "-l", lang,
+                "--tessdata-dir", tessdata_dir,
+                "-l", "ind+model_50k_custom",
                 "--dpi", "300",
                 "--psm", "6",
                 "--oem", "1"
