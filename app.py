@@ -71,7 +71,7 @@ if image_source and st.button("🔍 Cek Nutrisi"):
             crop_pil = Image.open(temp_path)
             st.session_state["crop_image"] = crop_pil
             st.session_state["ocr_raw"] = pytesseract.image_to_string(
-                crop_pil, lang="model_50k_custom", config="--oem 1 --psm 6"
+                crop_pil, lang="ind+model_50k_custom", config="--oem 1 --psm 6"
             )
             # st.session_state["ocr_text"] = koreksi_teks(st.session_state["ocr_raw"])
             st.session_state["nutrisi"] = ekstrak_nutrisi(st.session_state["ocr_raw"])
