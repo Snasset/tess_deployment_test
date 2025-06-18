@@ -4,17 +4,24 @@ FROM ubuntu:22.04
 # Set environment variable untuk non-interaktif instalasi apt
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Update package list dan instal dependensi Tesseract
-# Tambahkan PPA untuk Tesseract 5 (ini adalah PPA yang populer untuk versi terbaru)
+# Update package list dan instal dependensi Tesseract serta library tambahan kamu
 RUN apt-get update && apt-get install -y software-properties-common && \
     add-apt-repository -y ppa:alex-p/tesseract-ocr && \
     apt-get update && \
     apt-get install -y \
     tesseract-ocr \
     tesseract-ocr-eng \
-    # tesseract-ocr-ind \ # Hapus komentar jika perlu bahasa Indonesia
+    tesseract-ocr-ind \
+    libgl1 \            
+    libglib2.0-0 \     
     python3 \
     python3-pip \
+    # Tambahkan juga dependensi OpenCV lain yang umum jika nanti muncul error lain
+    libxext6 \
+    libxrender1 \
+    libfontconfig1 \
+    libsm6 \
+    libice6 \
     --no-install-recommends && \
     rm -rf /var/lib/apt/lists/*
 
