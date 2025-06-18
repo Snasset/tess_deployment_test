@@ -2,7 +2,7 @@
 FROM ubuntu:22.04
 
 # Set environment variable untuk non-interaktif instalasi apt
-ENV DEBIAN_FRONTEND=noninteractive
+ENV DEBIAN_FRONTEND="noninteractive"
 
 # Update package list dan instal dependensi Tesseract serta library tambahan kamu
 RUN apt-get update && apt-get install -y software-properties-common && \
