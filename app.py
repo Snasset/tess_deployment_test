@@ -8,6 +8,7 @@ import pytesseract
 from ultralytics import YOLO
 from util_helper.postproc import ekstrak_nutrisi, konversi_ke_100g, cek_kesehatan_bpom
 from util_helper.preproc import resize_img
+import subprocess
 
 # from paddleocr import PaddleOCR
 
@@ -62,19 +63,39 @@ if image_source and st.button("🔍 Cek Nutrisi"):
 
             x1, y1, x2, y2 = map(int, best_box.xyxy[0])
             crop = img_np[y1:y2, x1:x2]
-            crop_pil_raw = Image.fromarray(crop)
-            crop_bgr = cv2.cvtColor(np.array(crop_pil_raw), cv2.COLOR_RGB2BGR)
+            crop_bgr = cv2.cvtColor(crop, cv2.COLOR_RGB2BGR)
+
+            # Resize dan simpan ke file temp .tif
             resized_img = resize_img(crop_bgr, target_char_height=26)
-            # crop_pil = preprocess(crop_pil_raw)
             temp_path = "processed_tmp.tif"
             cv2.imwrite(temp_path, resized_img)
-            crop_pil = Image.open(temp_path)
-            st.session_state["crop_image"] = crop_pil
-            st.session_state["ocr_raw"] = pytesseract.image_to_string(
-                crop_pil, lang="ind+model_50k_custom", config="--oem 1 --psm 6"
-            )
-            # st.session_state["ocr_text"] = koreksi_teks(st.session_state["ocr_raw"])
-            st.session_state["nutrisi"] = ekstrak_nutrisi(st.session_state["ocr_raw"])
+
+            # Panggil Tesseract via CLI
+            tess_output_txt = "tess_result"
+            lang = "ind+model_50k_custom"
+            cmd = [
+                pytesseract.pytesseract.tesseract_cmd,
+                temp_path,
+                "-l", lang,
+                "--dpi", "300",
+                "--psm", "6",
+                "--oem", "1"
+            ]
+
+            try:
+                subprocess.run(cmd, check=True)
+                with open(f"{tess_output_txt}.txt", "r", encoding="utf-8") as f:
+                    ocr_result = f.read()
+            except subprocess.CalledProcessError:
+                st.error("❌ Gagal menjalankan Tesseract melalui CLI.")
+                st.stop()
+
+            st.session_state["crop_image"] = Image.open(temp_path)
+            st.session_state["ocr_raw"] = ocr_result
+            st.session_state["nutrisi"] = ekstrak_nutrisi(ocr_result)
+            os.remove(temp_path)
+            os.remove(f"{tess_output_txt}.txt")
+
         else:
             st.error("❌ Tidak ada tabel nutrisi terdeteksi oleh model.")
             st.stop()
