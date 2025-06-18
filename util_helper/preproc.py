@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import streamlit as st
 
 def get_valid_heights(thresh_img, draw_debug=False, debug_name="output_contour_visual.jpg"):
     contours, _ = cv2.findContours(thresh_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -28,7 +29,7 @@ def resize_img(img, target_char_height=31, draw_debug=False):
     """
     Resize image agar tinggi huruf (karakter) mendekati target_char_height (misal: 26px).
     """
-    print(f"🖼️ Original size: {img.shape[1]}×{img.shape[0]}")
+    st.write(f"🖼️ Original size: {img.shape[1]}×{img.shape[0]}")
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     mean_intensity = np.mean(gray)
     is_dark_bg = mean_intensity < 100
@@ -44,10 +45,10 @@ def resize_img(img, target_char_height=31, draw_debug=False):
     if valid_heights:
         avg_height = np.mean(valid_heights)
         scale = target_char_height / avg_height
-        print(f"📏 Total karakter terdeteksi: {len(valid_heights)}")
-        print(f"🎯 Rata-rata tinggi huruf: {avg_height} → Scale: {scale:.2f}")
+        st.write(f"📏 Total karakter terdeteksi: {len(valid_heights)}")
+        st.write(f"🎯 Rata-rata tinggi huruf: {avg_height} → Scale: {scale:.2f}")
         img = cv2.resize(img, None, fx=scale, fy=scale, interpolation=cv2.INTER_CUBIC)
     else:
         img = cv2.resize(img, None, fx=2.0, fy=2.0, interpolation=cv2.INTER_CUBIC)
-    print(f"📐 After resize: {img.shape[1]}×{img.shape[0]}")
+    st.write(f"📐 After resize: {img.shape[1]}×{img.shape[0]}")
     return img
