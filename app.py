@@ -6,8 +6,8 @@ from PIL import Image
 import streamlit as st
 import pytesseract
 from ultralytics import YOLO
-from util_helper.preproc import preprocess
-from util_helper.postproc import ekstrak_nutrisi, konversi_ke_100g, cek_kesehatan_bpom, koreksi_teks
+from util_helper.postproc import ekstrak_nutrisi, konversi_ke_100g, cek_kesehatan_bpom
+from util_helper.preproc import resize_img
 
 # from paddleocr import PaddleOCR
 
@@ -63,11 +63,15 @@ if image_source and st.button("🔍 Cek Nutrisi"):
             x1, y1, x2, y2 = map(int, best_box.xyxy[0])
             crop = img_np[y1:y2, x1:x2]
             crop_pil_raw = Image.fromarray(crop)
+            crop_bgr = cv2.cvtColor(np.array(crop_pil_raw), cv2.COLOR_RGB2BGR)
+            resized_img = resize_img(crop_bgr, target_char_height=26)
             # crop_pil = preprocess(crop_pil_raw)
-
-            st.session_state["crop_image"] = crop_pil_raw
+            temp_path = "processed_tmp.tif"
+            cv2.imwrite(temp_path, resized_img)
+            crop_pil = Image.open(temp_path)
+            st.session_state["crop_image"] = crop_pil
             st.session_state["ocr_raw"] = pytesseract.image_to_string(
-                crop_pil_raw, lang="model_50k_custom", config="--oem 1 --psm 6"
+                crop_pil, lang="model_50k_custom", config="--oem 1 --psm 6"
             )
             # st.session_state["ocr_text"] = koreksi_teks(st.session_state["ocr_raw"])
             st.session_state["nutrisi"] = ekstrak_nutrisi(st.session_state["ocr_raw"])
