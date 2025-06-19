@@ -13,12 +13,14 @@ from paddleocr import PaddleOCR
 # import paddleocr
 # st.write(f"Versi paddleocr **{paddleocr.__version__}**")
 # import pytesseract
-ocr = PaddleOCR(text_detection_model_dir='./paddleppocr/en_PP-OCRv3_det_infer/inference',
-                text_recognition_model_dir='./paddleppocr/best_model_50k/paddlev3_50k/inference',
-                rec_char_dict_path='./paddleppocr/en_dict.txt',
-                textline_orientation_model_dir='./paddleppocr/ch_ppocr_mobile_v2.0_cls_infer/inference',
-                lang="en",
-                use_textline_orientation=False)
+ocr = PaddleOCR(
+    text_detection_model_dir='paddleppocr/en_PP-OCRv3_det_infer',
+    text_recognition_model_dir='paddleppocr/best_model_50k/paddlev3_50k/inference',
+    textline_orientation_model_dir='paddleppocr/ch_ppocr_mobile_v2.0_cls_infer/inference',
+    rec_char_dict_path='paddleppocr/en_dict.txt',
+    lang='en',
+    use_textline_orientation=False
+)
 
 # st.write(f"Versi Pytesseract (wrapper): **{pytesseract.__version__}**")
 st.write(f"testing")
