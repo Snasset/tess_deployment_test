@@ -9,8 +9,7 @@ from ultralytics import YOLO
 from util_helper.postproc import ekstrak_nutrisi, konversi_ke_100g, cek_kesehatan_bpom
 from util_helper.preproc import resize_img
 import subprocess
-
-from paddleocr import PaddleOCR
+import paddleocr
 st.write(f"Versi paddleocr (wrapper): **{PaddleOCR.__version__}**")
 # import pytesseract
 ocr = PaddleOCR(text_detection_model_dir='./paddleppocr/en_PP-OCRv3_det_infer/inference',
