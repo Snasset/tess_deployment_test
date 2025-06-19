@@ -14,8 +14,8 @@ from paddleocr import PaddleOCR
 # st.write(f"Versi paddleocr **{paddleocr.__version__}**")
 # import pytesseract
 ocr = PaddleOCR(
-    text_detection_model_dir='paddleppocr/en_PP-OCRv3_det_infer',
-    text_recognition_model_dir='paddleppocr/best_model_50k/paddlev3_50k/inference',
+    rec_model_dir='paddleppocr/best_model_50k/paddlev3_50k/inference',
+    det_model_dir='paddleppocr/en_PP-OCRv3_det_infer',
     textline_orientation_model_dir='paddleppocr/ch_ppocr_mobile_v2.0_cls_infer/inference',
     rec_char_dict_path='paddleppocr/en_dict.txt',
     lang='en',
