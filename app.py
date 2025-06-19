@@ -10,7 +10,7 @@ from util_helper.postproc import ekstrak_nutrisi, konversi_ke_100g, cek_kesehata
 from util_helper.preproc import resize_img
 import subprocess
 
-# from paddleocr import PaddleOCR
+from paddleocr import PaddleOCR
 import pytesseract
 st.write(f"Versi Pytesseract (wrapper): **{pytesseract.__version__}**")
 
@@ -28,7 +28,7 @@ else:
 
 # Load model YOLO
 model = YOLO("tabledet_model/best.pt")
-# ocr = PaddleOCR(use_angle_cls=False, lang='en')
+ocr = PaddleOCR(det_model_dir='./paddleppocr/ch_ppocr_mobile_v2.0_cls_infer', rec_model_dir='./paddleppocr/best_model_50k/paddlev3_50k/inference', rec_char_dict_path='./paddleppocr/en_dict.txt', use_angle_cls=False)
 
 st.title("🍽️ Ekstraksi & Evaluasi Nutrisi")
 
