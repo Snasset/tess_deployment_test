@@ -28,10 +28,10 @@ else:
 
 # Load model YOLO
 model = YOLO("tabledet_model/best.pt")
-ocr = PaddleOCR(text_detection_model_dir='./paddleppocr/en_PP-OCRv3_det_infer/inference',
+ocr = PaddleOCR(text_detection_model_dir='./paddleppocr/en_PP-OCRv3_det_infer',
                 text_recognition_model_dir='./paddleppocr/best_model_50k/paddlev3_50k/inference',
                 # rec_char_dict_path='./paddleppocr/en_dict.txt',
-                textline_orientation_model_dir='./paddleppocr/ch_ppocr_mobile_v2.0_cls_infer/inference',
+                textline_orientation_model_dir='./paddleppocr/ch_ppocr_mobile_v2.0_cls_infer',
                 use_textline_orientation=False)
 
 st.title("🍽️ Ekstraksi & Evaluasi Nutrisi")
