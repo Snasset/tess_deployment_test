@@ -10,7 +10,7 @@ from util_helper.postproc import ekstrak_nutrisi, konversi_ke_100g, cek_kesehata
 from util_helper.preproc import resize_img
 import subprocess
 from paddleocr import PaddleOCR
-st.write(f"Versi paddleocr (wrapper): **{paddleocr.__version__}**")
+# st.write(f"Versi paddleocr (wrapper): **{paddleocr.__version__}**")
 # import pytesseract
 ocr = PaddleOCR(text_detection_model_dir='./paddleppocr/en_PP-OCRv3_det_infer/inference',
                 # text_recognition_model_dir='./paddleppocr/best_model_50k/paddlev3_50k/inference',
