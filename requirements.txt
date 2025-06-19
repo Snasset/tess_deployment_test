@@ -3,7 +3,7 @@ ultralytics
 pytesseract
 opencv-python-headless
 pillow
-numpy
 fuzzywuzzy
 paddleocr==2.7.0.0
+numpy
 paddlepaddle
