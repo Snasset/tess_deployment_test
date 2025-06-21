@@ -52,3 +52,39 @@ def resize_img(img, target_char_height=31, draw_debug=False):
         img = cv2.resize(img, None, fx=2.0, fy=2.0, interpolation=cv2.INTER_CUBIC)
     st.write(f"📐 After resize: {img.shape[1]}×{img.shape[0]}")
     return img
+
+def preproc_img(input_img):
+    resized_img = resize_img(input_img)
+    alpha = 0.7
+    beta = 50
+    clahe_clip = 2.0
+    tile_grid_size = (12, 12)
+    blur_kernel = (5, 5)
+    denoise_h = 20
+    img = cv2.imread(resized_img, 31)
+
+    # === GRAYSCALE
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    # === BRIGHTNESS & CONTRAST ADJUST
+    adjusted = cv2.convertScaleAbs(gray, alpha=alpha, beta=beta)
+
+    # === HIGHLIGHT MASK 
+    # mask = cv2.inRange(adjusted, 240, 255)
+
+    # === BLUR
+    blurred = cv2.GaussianBlur(adjusted, blur_kernel, 0)
+
+    # === CLAHE
+    clahe = cv2.createCLAHE(clipLimit=clahe_clip, tileGridSize=tile_grid_size)
+    enhanced = clahe.apply(blurred)
+
+    # === DENOISE
+    denoised = cv2.fastNlMeansDenoising(enhanced, h=denoise_h)
+
+    # === OTSU THRESHOLDING
+    _, binary = cv2.threshold(denoised, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+    # === CONVERT TO RGB
+    final_img = cv2.cvtColor(binary, cv2.COLOR_GRAY2RGB)
+    return final_img

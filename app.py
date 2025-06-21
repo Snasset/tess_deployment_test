@@ -7,7 +7,7 @@ import streamlit as st
 import pytesseract
 from ultralytics import YOLO
 from util_helper.postproc import ekstrak_nutrisi, konversi_ke_100g, cek_kesehatan_bpom, parse_paddle_result_sorted
-from util_helper.preproc import resize_img
+from util_helper.preproc import resize_img, preproc_img
 import subprocess
 # from paddleocr import PaddleOCR
 # import paddleocr
@@ -99,9 +99,10 @@ if image_source and st.button("🔍 Cek Nutrisi"):
             crop_bgr = cv2.cvtColor(crop, cv2.COLOR_RGB2BGR)
 
             # Resize dan simpan ke file temp .tif
-            resized_img = resize_img(crop_bgr, target_char_height=31)
+            # resized_img = resize_img(crop_bgr, target_char_height=31)
+            resized_img = preproc_img(crop_bgr)
             temp_path = "processed_tmp.tif"
-            Image.fromarray(crop_bgr).save(temp_path, dpi=(300, 300))
+            Image.fromarray(resized_img).save(temp_path, dpi=(300, 300))
 
             # Panggil Tesseract via CLI
             tess_output_txt = "tess_result"
