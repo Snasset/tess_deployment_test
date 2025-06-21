@@ -23,7 +23,7 @@ ocr = PaddleOCR(
 )
 
 # st.write(f"Versi Pytesseract (wrapper): **{pytesseract.__version__}**")
-st.write(f"testing")
+st.write(f"testing 1")
 uploaded_file = st.file_uploader("Upload Gambar", type=["jpg", "jpeg", "png"])
 if uploaded_file is not None:
     image = Image.open(uploaded_file).convert('RGB')
@@ -37,6 +37,8 @@ if uploaded_file is not None:
         for (bbox, text_data) in line:
             text, conf = text_data
             st.write(f"📌 {text} (confidence: {conf:.2f})")
+st.write(f"testing 2")
+
 
 # # Untuk mendapatkan versi Tesseract engine (termasuk Leptonica)
 # # Ini memerlukan Tesseract terinstal dan dapat diakses di PATH
