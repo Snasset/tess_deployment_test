@@ -101,7 +101,7 @@ if image_source and st.button("🔍 Cek Nutrisi"):
             # Resize dan simpan ke file temp .tif
             resized_img = resize_img(crop_bgr, target_char_height=31)
             temp_path = "processed_tmp.tif"
-            Image.fromarray(resized_img).save(temp_path, dpi=(300, 300))
+            Image.fromarray(crop_bgr).save(temp_path, dpi=(300, 300))
 
             # Panggil Tesseract via CLI
             tess_output_txt = "tess_result"
