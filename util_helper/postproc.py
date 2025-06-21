@@ -46,7 +46,7 @@ def ekstrak_nutrisi(text):
 
     for label, patterns in targets.items():
         for pattern in patterns:
-            match = re.search(rf"{pattern}.*?(\d+\.?\d*)\s*(g|mg|ml|kkal|%)", cleaned_text, re.DOTALL)
+            match = re.search(rf"{pattern}.*?(\d+\.?\d*)\s*(g|mg|ml|kkal)", cleaned_text, re.DOTALL)
             if match:
                 val = float(match.group(1))
                 unit = match.group(2)

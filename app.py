@@ -98,7 +98,7 @@ if image_source and st.button("🔍 Cek Nutrisi"):
 
             # Panggil Tesseract via CLI
             with st.spinner("🔍 Menjalankan OCR dengan PaddleOCR..."):
-                ocr_result_raw = ocr.ocr(resized_img, cls=False)
+                ocr_result_raw = ocr.ocr(crop_bgr, cls=False)
 
     # Gabungkan hasil menjadi satu string
                 ocr_result = ""
