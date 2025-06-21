@@ -54,14 +54,14 @@ def resize_img(img, target_char_height=31, draw_debug=False):
     return img
 
 def preproc_img(input_img):
-    resized_img = resize_img(input_img)
+    resized_img = resize_img(input_img, 31)
     alpha = 0.7
     beta = 50
     clahe_clip = 2.0
     tile_grid_size = (12, 12)
     blur_kernel = (5, 5)
     denoise_h = 20
-    img = cv2.imread(resized_img, 31)
+    img = cv2.imread(resized_img)
 
     # === GRAYSCALE
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
