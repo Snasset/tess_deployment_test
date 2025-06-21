@@ -4,6 +4,6 @@ pytesseract
 opencv-python-headless
 pillow
 fuzzywuzzy
-paddleocr==3.0.0
+paddleocr==2.10.0
 numpy
 paddlepaddle
