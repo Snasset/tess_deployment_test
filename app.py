@@ -9,21 +9,21 @@ from ultralytics import YOLO
 from util_helper.postproc import ekstrak_nutrisi, konversi_ke_100g, cek_kesehatan_bpom, parse_paddle_result_sorted
 from util_helper.preproc import resize_img
 import subprocess
-from paddleocr import PaddleOCR
+# from paddleocr import PaddleOCR
 # import paddleocr
 # st.write(f"Versi paddleocr **{paddleocr.__version__}**")
 # import pytesseract
-import logging
+# import logging
 
-ocr = PaddleOCR(
-    rec_model_dir='paddleppocr/best_model_50k/paddlev3_50k/inference',
-    det_model_dir='paddleppocr/en_PP-OCRv3_det_infer',
-    textline_orientation_model_dir='paddleppocr/ch_ppocr_mobile_v2.0_cls_infer',
-    rec_char_dict_path='paddleppocr/en_dict.txt',
-    lang='en',
-    use_textline_orientation=False
-)
-logging.basicConfig(level=logging.INFO)
+# ocr = PaddleOCR(
+#     rec_model_dir='paddleppocr/best_model_50k/paddlev3_50k/inference',
+#     det_model_dir='paddleppocr/en_PP-OCRv3_det_infer',
+#     textline_orientation_model_dir='paddleppocr/ch_ppocr_mobile_v2.0_cls_infer',
+#     rec_char_dict_path='paddleppocr/en_dict.txt',
+#     lang='en',
+#     use_textline_orientation=False
+# )
+# logging.basicConfig(level=logging.INFO)
 
 
 # st.write(f"Versi Pytesseract (wrapper): **{pytesseract.__version__}**")
@@ -44,6 +44,13 @@ logging.basicConfig(level=logging.INFO)
 # st.write(f"testing 2")
 
 
+# SETUP TESSERACT
+os.environ["TESSDATA_PREFIX"] = os.path.abspath("./tess_trainneddata")
+tessdata_dir = os.path.abspath("./tess_trainneddata")
+if platform.system() == "Windows":
+    pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+else:
+    pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"
 
 # Load model YOLO
 model = YOLO("tabledet_model/best.pt")
@@ -97,20 +104,31 @@ if image_source and st.button("🔍 Cek Nutrisi"):
             Image.fromarray(resized_img).save(temp_path, dpi=(300, 300))
 
             # Panggil Tesseract via CLI
-            with st.spinner("🔍 Menjalankan OCR dengan PaddleOCR..."):
-                ocr_result_raw = ocr.ocr(crop_bgr, cls=False)
-                
+            tess_output_txt = "tess_result"
+            cmd = [
+                pytesseract.pytesseract.tesseract_cmd,
+                temp_path,
+                tess_output_txt,
+                "--tessdata-dir", tessdata_dir,
+                "-l", "ind+model_50k_custom",
+                "--dpi", "300",
+                "--psm", "6",
+                "--oem", "1"
+            ]
 
-    # Gabungkan hasil menjadi satu string
-                ocr_result = ""
-                for line in ocr_result_raw[0]:
-                    text = line[1][0]
-                    ocr_result += text + "\n"
-                ocr_result = parse_paddle_result_sorted(result)
-                st.session_state["crop_image"] = Image.open(temp_path)
-                st.session_state["ocr_raw"] = ocr_result
-                st.session_state["nutrisi"] = ekstrak_nutrisi(ocr_result)
-                os.remove(temp_path)
+            try:
+                subprocess.run(cmd, check=True)
+                with open(f"{tess_output_txt}.txt", "r", encoding="utf-8") as f:
+                    ocr_result = f.read()
+            except subprocess.CalledProcessError:
+                st.error("❌ Gagal menjalankan Tesseract melalui CLI.")
+                st.stop()
+
+            st.session_state["crop_image"] = Image.open(temp_path)
+            st.session_state["ocr_raw"] = ocr_result
+            st.session_state["nutrisi"] = ekstrak_nutrisi(ocr_result)
+            os.remove(temp_path)
+            os.remove(f"{tess_output_txt}.txt")
 
         else:
             st.error("❌ Tidak ada tabel nutrisi terdeteksi oleh model.")
