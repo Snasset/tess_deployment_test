@@ -13,6 +13,8 @@ from paddleocr import PaddleOCR
 # import paddleocr
 # st.write(f"Versi paddleocr **{paddleocr.__version__}**")
 # import pytesseract
+import logging
+
 ocr = PaddleOCR(
     rec_model_dir='paddleppocr/best_model_50k/paddlev3_50k/inference',
     det_model_dir='paddleppocr/en_PP-OCRv3_det_infer',
@@ -21,6 +23,12 @@ ocr = PaddleOCR(
     lang='en',
     use_textline_orientation=False
 )
+logging.basicConfig(level=logging.INFO)
+model_path = 'paddleppocr/best_model_50k/paddlev3_50k/inference'
+if os.path.exists(os.path.join(model_path, 'inference.pdmodel')):
+    st.write("✅ Menggunakan model lokal:", model_path)
+else:
+    st.write("⚠️ Model lokal tidak ditemukan, kemungkinan mendownload otomatis.")
 
 # st.write(f"Versi Pytesseract (wrapper): **{pytesseract.__version__}**")
 st.write(f"testing 1")
