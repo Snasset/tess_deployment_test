@@ -219,18 +219,27 @@ def cek_kesehatan_bpom(kategori, nutrisi_dict):
 
     return hasil
 
-
-def sort_ocr_boxes(ocr_result):
+def sort_ocr_boxes(ocr_lines):
     """
-    Mengurutkan hasil OCR dari kiri ke kanan, atas ke bawah (seperti baca manusia)
+    Urutkan hasil OCR (list of [box, (text, confidence)]) dari atas ke bawah, kiri ke kanan
     """
-    boxes = sorted(ocr_result, key=lambda b: (min(b[0][0][1], b[0][1][1]), min(b[0][0][0], b[0][1][0])))
-    return boxes
+    def get_top_left_yx(box):
+        # Ambil titik kiri atas dari box
+        top_left = min(box, key=lambda p: (p[1], p[0]))  # sort by y, then x
+        return top_left[1], top_left[0]  # (y, x)
+    
+    return sorted(ocr_lines, key=lambda b: get_top_left_yx(b[0]))
 
 def parse_paddle_result_sorted(result):
+    """
+    Parse hasil PaddleOCR dan gabungkan teks yang sudah disortir
+    """
     lines = []
+    if not result or not isinstance(result[0], list):
+        return ""
+
     sorted_boxes = sort_ocr_boxes(result[0])
-    for line in sorted_boxes:
-        text = line[1][0]
+    for box_info in sorted_boxes:
+        text = box_info[1][0]
         lines.append(text)
     return "\n".join(lines)
