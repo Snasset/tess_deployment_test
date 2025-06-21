@@ -218,3 +218,19 @@ def cek_kesehatan_bpom(kategori, nutrisi_dict):
             hasil.append(f"Gagal memproses nilai untuk {nutrien}.")
 
     return hasil
+
+
+def sort_ocr_boxes(ocr_result):
+    """
+    Mengurutkan hasil OCR dari kiri ke kanan, atas ke bawah (seperti baca manusia)
+    """
+    boxes = sorted(ocr_result, key=lambda b: (min(b[0][0][1], b[0][1][1]), min(b[0][0][0], b[0][1][0])))
+    return boxes
+
+def parse_paddle_result_sorted(result):
+    lines = []
+    sorted_boxes = sort_ocr_boxes(result[0])
+    for line in sorted_boxes:
+        text = line[1][0]
+        lines.append(text)
+    return "\n".join(lines)

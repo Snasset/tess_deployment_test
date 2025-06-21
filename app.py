@@ -6,7 +6,7 @@ from PIL import Image
 import streamlit as st
 import pytesseract
 from ultralytics import YOLO
-from util_helper.postproc import ekstrak_nutrisi, konversi_ke_100g, cek_kesehatan_bpom
+from util_helper.postproc import ekstrak_nutrisi, konversi_ke_100g, cek_kesehatan_bpom, parse_paddle_result_sorted
 from util_helper.preproc import resize_img
 import subprocess
 from paddleocr import PaddleOCR
@@ -99,13 +99,14 @@ if image_source and st.button("🔍 Cek Nutrisi"):
             # Panggil Tesseract via CLI
             with st.spinner("🔍 Menjalankan OCR dengan PaddleOCR..."):
                 ocr_result_raw = ocr.ocr(crop_bgr, cls=False)
+                
 
     # Gabungkan hasil menjadi satu string
                 ocr_result = ""
                 for line in ocr_result_raw[0]:
                     text = line[1][0]
                     ocr_result += text + "\n"
-
+                ocr_result = parse_paddle_result_sorted(result)
                 st.session_state["crop_image"] = Image.open(temp_path)
                 st.session_state["ocr_raw"] = ocr_result
                 st.session_state["nutrisi"] = ekstrak_nutrisi(ocr_result)
