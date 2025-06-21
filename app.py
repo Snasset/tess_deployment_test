@@ -97,19 +97,19 @@ if image_source and st.button("🔍 Cek Nutrisi"):
             Image.fromarray(resized_img).save(temp_path, dpi=(300, 300))
 
             # Panggil Tesseract via CLI
-            ocr_result_raw = ocr.ocr(resized_img, cls=False)
+            with st.spinner("🔍 Menjalankan OCR dengan PaddleOCR..."):
+                ocr_result_raw = ocr.ocr(resized_img, cls=False)
 
-# Gabungkan hasil menjadi satu string
-            ocr_result = ""
-            for line in ocr_result_raw[0]:
-                text = line[1][0]
-                ocr_result += text + "\n"
+    # Gabungkan hasil menjadi satu string
+                ocr_result = ""
+                for line in ocr_result_raw[0]:
+                    text = line[1][0]
+                    ocr_result += text + "\n"
 
-            st.session_state["crop_image"] = Image.open(temp_path)
-            st.session_state["ocr_raw"] = ocr_result
-            st.session_state["nutrisi"] = ekstrak_nutrisi(ocr_result)
-            os.remove(temp_path)
-            os.remove(f"{tess_output_txt}.txt")
+                st.session_state["crop_image"] = Image.open(temp_path)
+                st.session_state["ocr_raw"] = ocr_result
+                st.session_state["nutrisi"] = ekstrak_nutrisi(ocr_result)
+                os.remove(temp_path)
 
         else:
             st.error("❌ Tidak ada tabel nutrisi terdeteksi oleh model.")
