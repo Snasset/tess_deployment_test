@@ -61,7 +61,7 @@ def preproc_img(input_img):
     tile_grid_size = (12, 12)
     blur_kernel = (5, 5)
     denoise_h = 20
-    img = cv2.imread(resized_img)
+    img = resized_img
 
     # === GRAYSCALE
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
