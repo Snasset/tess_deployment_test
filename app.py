@@ -50,8 +50,8 @@ tessdata_dir = os.path.abspath("./tess_trainneddata")
 if platform.system() == "Windows":
     pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 else:
-    pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"
-
+    pytesseract.pytesseract.tesseract_cmd = "./Tesseract-OCR/tesseract.exe"
+st.write(f"Versi Pytesseract (wrapper): **{pytesseract.__version__}**")
 # Load model YOLO
 model = YOLO("tabledet_model/best.pt")
 
