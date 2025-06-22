@@ -56,10 +56,10 @@ def resize_img(img, target_char_height=31, draw_debug=False):
 def preproc_img(input_img):
     resized_img = resize_img(input_img, 31)
     alpha = 0.7
-    beta = 50
+    beta = 60
     clahe_clip = 2.0
-    tile_grid_size = (12, 12)
-    blur_kernel = (5, 5)
+    tile_grid_size = (8, 8)
+    blur_kernel = (3, 3)
     denoise_h = 20
     img = resized_img
 
