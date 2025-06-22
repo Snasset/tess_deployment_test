@@ -52,7 +52,7 @@ if platform.system() == "Windows":
 else:
     pytesseract.pytesseract.tesseract_cmd = "./Tesseract-OCR/tesseract.exe"
 result = subprocess.run(['tesseract', '--version'], capture_output=True, text=True, check=True)
-st.write(f"Versi tess : **result**")
+st.write(f"Versi tess : **{result}**")
 # Load model YOLO
 model = YOLO("tabledet_model/best.pt")
 
