@@ -46,14 +46,22 @@ import subprocess
 
 # SETUP TESSERACT
 os.environ["TESSDATA_PREFIX"] = os.path.abspath("./tess_trainneddata")
-tesseract_path = os.path.abspath("./Tesseract-OCR/tesseract.exe")
 tessdata_dir = os.path.abspath("./tess_trainneddata")
+
+# Deteksi sistem operasi dan set path ke binary tesseract
 if platform.system() == "Windows":
     pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+    tesseract_path = pytesseract.pytesseract.tesseract_cmd
 else:
-    pytesseract.pytesseract.tesseract_cmd = "./Tesseract-OCR/tesseract.exe"
-result = subprocess.run([tesseract_path, '--version'], capture_output=True, text=True, check=True)
-st.write(f"Versi tess : **{result}**")
+    pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"  # default untuk Linux
+    tesseract_path = pytesseract.pytesseract.tesseract_cmd
+
+# Tampilkan versi Tesseract (try-except untuk error handling)
+try:
+    result = subprocess.run([tesseract_path, '--version'], capture_output=True, text=True, check=True)
+    st.write(f"Versi Tesseract: **{result.stdout.splitlines()[0]}**")
+except Exception as e:
+    st.error(f"Gagal cek versi Tesseract: {e}")
 # Load model YOLO
 model = YOLO("tabledet_model/best.pt")
 
