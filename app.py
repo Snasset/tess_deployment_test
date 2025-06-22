@@ -9,6 +9,7 @@ from ultralytics import YOLO
 from util_helper.postproc import ekstrak_nutrisi, konversi_ke_100g, cek_kesehatan_bpom, parse_paddle_result_sorted
 from util_helper.preproc import resize_img, preproc_img
 import subprocess
+import shutil
 # from paddleocr import PaddleOCR
 # import paddleocr
 # st.write(f"Versi paddleocr **{paddleocr.__version__}**")
@@ -53,7 +54,7 @@ if platform.system() == "Windows":
     pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
     tesseract_path = pytesseract.pytesseract.tesseract_cmd
 else:
-    pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"  # default untuk Linux
+    pytesseract.pytesseract.tesseract_cmd = shutil.which("tesseract") or "/usr/bin/tesseract"  # default untuk Linux
     tesseract_path = pytesseract.pytesseract.tesseract_cmd
 
 # Tampilkan versi Tesseract (try-except untuk error handling)
