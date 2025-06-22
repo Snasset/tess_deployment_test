@@ -46,12 +46,13 @@ import subprocess
 
 # SETUP TESSERACT
 os.environ["TESSDATA_PREFIX"] = os.path.abspath("./tess_trainneddata")
+tesseract_path = os.path.abspath("./Tesseract-OCR/tesseract.exe")
 tessdata_dir = os.path.abspath("./tess_trainneddata")
 if platform.system() == "Windows":
     pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 else:
     pytesseract.pytesseract.tesseract_cmd = "./Tesseract-OCR/tesseract.exe"
-result = subprocess.run(['tesseract', '--version'], capture_output=True, text=True, check=True)
+result = subprocess.run([tesseract_path, '--version'], capture_output=True, text=True, check=True)
 st.write(f"Versi tess : **{result}**")
 # Load model YOLO
 model = YOLO("tabledet_model/best.pt")
