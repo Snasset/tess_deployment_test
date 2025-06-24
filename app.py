@@ -131,7 +131,7 @@ if image_source and st.button("🔍 Cek Nutrisi"):
 
             try:
                 subprocess.run(cmd, check=True)
-                tessedit_image_path = f"{tess_output_txt}.tessinput.tif"
+                tessedit_image_path = f"{tess_output_txt}.tif"
                 if os.path.exists(tessedit_image_path):
                     tessedit_img = Image.open(tessedit_image_path)
                     st.image(tessedit_img, caption="🔍 Gambar Hasil Preprocessing Tesseract", use_column_width=True)
