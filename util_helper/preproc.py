@@ -45,6 +45,10 @@ def resize_img(img, target_char_height=31, draw_debug=False):
     if valid_heights:
         avg_height = np.mean(valid_heights)
         scale = target_char_height / avg_height
+        if scale < 1:
+            scale = 1.5
+        elif scale > 2:
+            return img
         st.write(f"📏 Total karakter terdeteksi: {len(valid_heights)}")
         st.write(f"🎯 Rata-rata tinggi huruf: {avg_height} → Scale: {scale:.2f}")
         img = cv2.resize(img, None, fx=scale, fy=scale, interpolation=cv2.INTER_CUBIC)
@@ -54,13 +58,13 @@ def resize_img(img, target_char_height=31, draw_debug=False):
     return img
 
 def preproc_img(input_img):
-    resized_img = resize_img(input_img, 31)
-    alpha = 0.7
-    beta = 60
+    resized_img = resize_img(input_img, 26)
+    alpha = 0.6
+    beta = 40
     clahe_clip = 2.0
     tile_grid_size = (8, 8)
     blur_kernel = (3, 3)
-    denoise_h = 20
+    denoise_h = 30
     img = resized_img
 
     # === GRAYSCALE
@@ -83,8 +87,11 @@ def preproc_img(input_img):
     denoised = cv2.fastNlMeansDenoising(enhanced, h=denoise_h)
 
     # === OTSU THRESHOLDING
-    _, binary = cv2.threshold(denoised, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+    # mean_intensity = np.mean(denoised)
+    # if mean_intensity < 127:
+    #     denoised = cv2.bitwise_not(denoised)
+    # _, binary = cv2.threshold(denoised, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
     # === CONVERT TO RGB
-    final_img = cv2.cvtColor(binary, cv2.COLOR_GRAY2RGB)
+    final_img = cv2.cvtColor(denoised, cv2.COLOR_GRAY2RGB)
     return final_img
