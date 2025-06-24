@@ -125,11 +125,23 @@ if image_source and st.button("🔍 Cek Nutrisi"):
                 "-l", "ind+model_50k_custom",
                 "--dpi", "300",
                 "--psm", "6",
-                "--oem", "1"
+                "--oem", "1",
+                "-c", "tessedit_write_images=true" 
             ]
 
             try:
                 subprocess.run(cmd, check=True)
+                tessedit_image_path = f"{tess_output_txt}.tessinput.tif"
+                if os.path.exists(tessedit_image_path):
+                    tessedit_img = Image.open(tessedit_image_path)
+                    st.image(tessedit_img, caption="🔍 Gambar Hasil Preprocessing Tesseract", use_column_width=True)
+                else:
+                    st.warning("⚠️ Gambar tessedit_write_images tidak ditemukan.")
+                    
+                try:
+                    os.remove(tessedit_image_path)
+                except Exception as e:
+                    st.warning(f"⚠️ Gagal hapus file tessedit image: {e}")
                 with open(f"{tess_output_txt}.txt", "r", encoding="utf-8") as f:
                     ocr_result = f.read()
             except subprocess.CalledProcessError:
