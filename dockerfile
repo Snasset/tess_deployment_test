@@ -33,7 +33,7 @@ COPY . .
 
 # Install Python dependencies
 RUN pip3 install --upgrade pip
-RUN pip3 install --no-cache-dir -r requirements.txt
+RUN pip3 install --no-cache-dir --break-system-packages -r requirements.txt
 
 # Port untuk Streamlit
 EXPOSE 8501
