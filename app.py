@@ -50,19 +50,18 @@ os.environ["TESSDATA_PREFIX"] = os.path.abspath("./tess_trainneddata")
 tessdata_dir = os.path.abspath("./tess_trainneddata")
 
 # Deteksi sistem operasi dan set path ke binary tesseract
-if platform.system() == "Windows":
-    pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-    tesseract_path = pytesseract.pytesseract.tesseract_cmd
+tesseract_path = shutil.which("tesseract")
+if tesseract_path is None:
+    st.error("Tesseract tidak ditemukan di container.")
 else:
-    pytesseract.pytesseract.tesseract_cmd = shutil.which("tesseract") or "/usr/bin/tesseract"  # default untuk Linux
-    tesseract_path = pytesseract.pytesseract.tesseract_cmd
+    pytesseract.pytesseract.tesseract_cmd = tesseract_path
 
-# Tampilkan versi Tesseract (try-except untuk error handling)
-try:
-    result = subprocess.run([tesseract_path, '--version'], capture_output=True, text=True, check=True)
-    st.write(f"Versi Tesseract: **{result.stdout.splitlines()[0]}**")
-except Exception as e:
-    st.error(f"Gagal cek versi Tesseract: {e}")
+    # Tampilkan versi Tesseract
+    try:
+        result = subprocess.run([tesseract_path, '--version'], capture_output=True, text=True, check=True)
+        st.write(f"Versi Tesseract: **{result.stdout.splitlines()[0]}**")
+    except Exception as e:
+        st.error(f"Gagal cek versi Tesseract: {e}")
 # Load model YOLO
 model = YOLO("tabledet_model/best.pt")
 
