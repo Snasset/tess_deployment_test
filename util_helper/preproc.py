@@ -58,10 +58,10 @@ def resize_img(img, target_char_height=31, draw_debug=False):
     return img
 
 def preproc_img(input_img):
-    resized_img = resize_img(input_img, 26)
-    alpha = 0.6
-    beta = 40
-    clahe_clip = 2.0
+    resized_img = resize_img(input_img, 24)
+    alpha = 0.7
+    beta = 50
+    clahe_clip = 1.0
     tile_grid_size = (8, 8)
     blur_kernel = (3, 3)
     denoise_h = 30
@@ -87,12 +87,16 @@ def preproc_img(input_img):
     denoised = cv2.fastNlMeansDenoising(enhanced, h=denoise_h)
 
     # === OTSU THRESHOLDING
-    mean_intensity = np.mean(denoised)
-    if mean_intensity < 127:
-        denoised = cv2.bitwise_not(denoised)
-        _, denoised = cv2.threshold(denoised, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    # mean_intensity = np.mean(denoised)
+    # if mean_intensity < 127:
+    #     denoised = cv2.bitwise_not(denoised)
+    #     _, denoised = cv2.threshold(denoised, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     
 
     # === CONVERT TO RGB
     final_img = cv2.cvtColor(denoised, cv2.COLOR_GRAY2RGB)
     return final_img
+
+def filter_smooth(input_img, d_values = 10, sigma_a = 150, sigma_b = 75):
+    filtered = cv2.bilateralFilter(input_img, d=d_values, sigmaColor=sigma_a, sigmaSpace=sigma_b)
+    return filtered
