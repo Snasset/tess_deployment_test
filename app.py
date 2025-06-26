@@ -60,8 +60,8 @@ if uploaded_file:
                 crop = img_np[y1:y2, x1:x2]
                 crop_bgr = cv2.cvtColor(crop, cv2.COLOR_RGB2BGR)
 
-                # resized = resize_img(crop_bgr, target_char_height=30)
-                # filtered = filter_smooth(resized,10,150,75)
+                # resized = resize_img(crop_bgr, target_char_height=35)
+                # filtered = filter_smooth(resized,1,50,75)
                 preproc_img = preproc_img(crop_bgr)
                 temp_path = "processed_tmp.tif"
                 Image.fromarray(preproc_img).save(temp_path, dpi=(300, 300))
