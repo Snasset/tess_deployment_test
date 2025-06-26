@@ -219,27 +219,38 @@ def cek_kesehatan_bpom(kategori, nutrisi_dict):
 
     return hasil
 
-def sort_ocr_boxes(ocr_lines):
+def postproc_paddle(paddle_result, y_thresh=10):
     """
-    Urutkan hasil OCR (list of [box, (text, confidence)]) dari atas ke bawah, kiri ke kanan
+    Gabungkan hasil PaddleOCR berdasarkan posisi y (vertikal) agar output menyerupai teks dalam baris.
+    Argumen:
+        paddle_result: hasil dari paddleocr.ocr(image)
+        y_thresh: toleransi perbedaan y agar dianggap satu baris
+    Return:
+        String hasil OCR yang sudah diformat ulang
     """
-    def get_top_left_yx(box):
-        # Ambil titik kiri atas dari box
-        top_left = min(box, key=lambda p: (p[1], p[0]))  # sort by y, then x
-        return top_left[1], top_left[0]  # (y, x)
-    
-    return sorted(ocr_lines, key=lambda b: get_top_left_yx(b[0]))
-
-def parse_paddle_result_sorted(result):
-    """
-    Parse hasil PaddleOCR dan gabungkan teks yang sudah disortir
-    """
-    lines = []
-    if not result or not isinstance(result[0], list):
+    if not paddle_result or not paddle_result[0]:
         return ""
 
-    sorted_boxes = sort_ocr_boxes(result[0])
-    for box_info in sorted_boxes:
-        text = box_info[1][0]
-        lines.append(text)
+    lines = []
+    current_line = []
+    prev_y = None
+
+    # Urutkan berdasarkan posisi y (atas ke bawah), lalu x (kiri ke kanan)
+    sorted_results = sorted(paddle_result[0], key=lambda r: (r[0][0][1], r[0][0][0]))
+
+    for box, (text, conf) in sorted_results:
+        y = int(box[0][1])
+        if prev_y is None:
+            prev_y = y
+        if abs(y - prev_y) > y_thresh:
+            # Baris baru
+            lines.append(" ".join([t[1] for t in current_line]))
+            current_line = []
+            prev_y = y
+        current_line.append((box, text))
+
+    # Tambahkan baris terakhir
+    if current_line:
+        lines.append(" ".join([t[1] for t in current_line]))
+
     return "\n".join(lines)
