@@ -87,10 +87,10 @@ def preproc_img(input_img):
     denoised = cv2.fastNlMeansDenoising(enhanced, h=denoise_h)
 
     # === OTSU THRESHOLDING
-    # mean_intensity = np.mean(denoised)
-    # if mean_intensity < 127:
-    #     denoised = cv2.bitwise_not(denoised)
-    #     _, denoised = cv2.threshold(denoised, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    mean_intensity = np.mean(denoised)
+    if mean_intensity < 127:
+        denoised = cv2.bitwise_not(denoised)
+        _, denoised = cv2.threshold(denoised, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     
 
     # === CONVERT TO RGB
