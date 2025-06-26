@@ -64,7 +64,7 @@ def preproc_img(input_img):
     clahe_clip = 2.0
     tile_grid_size = (8, 8)
     blur_kernel = (3, 3)
-    denoise_h = 10
+    denoise_h = 30
     img = resized_img
 
     # === GRAYSCALE
