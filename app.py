@@ -10,7 +10,7 @@ from ultralytics import YOLO
 from paddleocr import PaddleOCR
 
 from util_helper.preproc import resize_img, filter_smooth
-from util_helper.postproc import ekstrak_nutrisi, konversi_ke_100g, cek_kesehatan_bpom
+from util_helper.postproc import ekstrak_nutrisi, konversi_ke_100g, cek_kesehatan_bpom, postproc_paddle
 
 # === SETUP ===
 os.environ["TESSDATA_PREFIX"] = os.path.abspath("./tess_trainneddata")
@@ -113,8 +113,8 @@ if uploaded_file:
 
                 with st.spinner("🔎 Menjalankan PaddleOCR..."):
                     ocr_raw = ocr.ocr(crop_bgr, cls=False)
-
-                text_out = "\n".join([line[1][0] for line in ocr_raw[0]])
+                ocr_cleaned = postproc_paddle(ocr_raw)
+                text_out = "\n".join([line[1][0] for line in ocr_cleaned[0]])
                 st.session_state["crop_image"] = Image.open(temp_path)
                 st.session_state["ocr_raw"] = text_out
                 st.session_state["nutrisi"] = ekstrak_nutrisi(text_out)
