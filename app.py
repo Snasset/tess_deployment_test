@@ -9,7 +9,7 @@ import streamlit as st
 from ultralytics import YOLO
 from paddleocr import PaddleOCR
 
-from util_helper.preproc import resize_img, filter_smooth
+from util_helper.preproc import resize_img, filter_smooth, preproc_img
 from util_helper.postproc import ekstrak_nutrisi, konversi_ke_100g, cek_kesehatan_bpom, postproc_paddle
 
 # === SETUP ===
@@ -60,10 +60,11 @@ if uploaded_file:
                 crop = img_np[y1:y2, x1:x2]
                 crop_bgr = cv2.cvtColor(crop, cv2.COLOR_RGB2BGR)
 
-                resized = resize_img(crop_bgr, target_char_height=30)
-                filtered = filter_smooth(resized,10,150,75)
+                # resized = resize_img(crop_bgr, target_char_height=30)
+                # filtered = filter_smooth(resized,10,150,75)
+                preproc_img = preproc_img(crop_bgr)
                 temp_path = "processed_tmp.tif"
-                Image.fromarray(filtered).save(temp_path, dpi=(300, 300))
+                Image.fromarray(preproc_img).save(temp_path, dpi=(300, 300))
 
                 tess_output_txt = "tess_result"
                 cmd = [
