@@ -6,25 +6,24 @@ from PIL import Image
 import streamlit as st
 import pytesseract
 from ultralytics import YOLO
-from util_helper.postproc import ekstrak_nutrisi, konversi_ke_100g, cek_kesehatan_bpom, parse_paddle_result_sorted
-from util_helper.preproc import resize_img, preproc_img
+from util_helper.postproc import ekstrak_nutrisi, konversi_ke_100g, cek_kesehatan_bpom
+from util_helper.preproc import resize_img
 import subprocess
-import shutil
-# from paddleocr import PaddleOCR
+from paddleocr import PaddleOCR
 # import paddleocr
 # st.write(f"Versi paddleocr **{paddleocr.__version__}**")
 # import pytesseract
-# import logging
+import logging
 
-# ocr = PaddleOCR(
-#     rec_model_dir='paddleppocr/best_model_50k/paddlev3_50k/inference',
-#     det_model_dir='paddleppocr/en_PP-OCRv3_det_infer',
-#     textline_orientation_model_dir='paddleppocr/ch_ppocr_mobile_v2.0_cls_infer',
-#     rec_char_dict_path='paddleppocr/en_dict.txt',
-#     lang='en',
-#     use_textline_orientation=False
-# )
-# logging.basicConfig(level=logging.INFO)
+ocr = PaddleOCR(
+    rec_model_dir='paddleppocr/best_model_50k/paddlev3_50k/inference',
+    det_model_dir='paddleppocr/en_PP-OCRv3_det_infer',
+    textline_orientation_model_dir='paddleppocr/ch_ppocr_mobile_v2.0_cls_infer',
+    rec_char_dict_path='paddleppocr/en_dict.txt',
+    lang='en',
+    use_textline_orientation=False
+)
+logging.basicConfig(level=logging.INFO)
 
 
 # st.write(f"Versi Pytesseract (wrapper): **{pytesseract.__version__}**")
@@ -45,23 +44,7 @@ import shutil
 # st.write(f"testing 2")
 
 
-# SETUP TESSERACT
-os.environ["TESSDATA_PREFIX"] = os.path.abspath("./tess_trainneddata")
-tessdata_dir = os.path.abspath("./tess_trainneddata")
 
-# Deteksi sistem operasi dan set path ke binary tesseract
-tesseract_path = shutil.which("tesseract")
-if tesseract_path is None:
-    st.error("Tesseract tidak ditemukan di container.")
-else:
-    pytesseract.pytesseract.tesseract_cmd = tesseract_path
-
-    # Tampilkan versi Tesseract
-    try:
-        result = subprocess.run([tesseract_path, '--version'], capture_output=True, text=True, check=True)
-        st.write(f"Versi Tesseract: **{result.stdout.splitlines()[0]}**")
-    except Exception as e:
-        st.error(f"Gagal cek versi Tesseract: {e}")
 # Load model YOLO
 model = YOLO("tabledet_model/best.pt")
 
@@ -109,49 +92,24 @@ if image_source and st.button("🔍 Cek Nutrisi"):
             crop_bgr = cv2.cvtColor(crop, cv2.COLOR_RGB2BGR)
 
             # Resize dan simpan ke file temp .tif
-            # resized_img = resize_img(crop_bgr, target_char_height=31)
-            resized_img = preproc_img(crop_bgr)
+            resized_img = resize_img(crop_bgr, target_char_height=31)
             temp_path = "processed_tmp.tif"
             Image.fromarray(resized_img).save(temp_path, dpi=(300, 300))
 
             # Panggil Tesseract via CLI
-            tess_output_txt = "tess_result"
-            cmd = [
-                pytesseract.pytesseract.tesseract_cmd,
-                temp_path,
-                tess_output_txt,
-                "--tessdata-dir", tessdata_dir,
-                "-l", "ind+model_50k_custom",
-                "--dpi", "300",
-                "--psm", "6",
-                "--oem", "1",
-                "-c", "tessedit_write_images=true" 
-            ]
+            with st.spinner("🔍 Menjalankan OCR dengan PaddleOCR..."):
+                ocr_result_raw = ocr.ocr(crop_bgr, cls=False)
 
-            try:
-                subprocess.run(cmd, check=True)
-                tessedit_image_path = "tessinput.tif"
-                if os.path.exists(tessedit_image_path):
-                    tessedit_img = Image.open(tessedit_image_path)
-                    st.image(tessedit_img, caption="🔍 Gambar Hasil Preprocessing Tesseract", use_column_width=True)
-                else:
-                    st.warning("⚠️ Gambar tessedit_write_images tidak ditemukan.")
-                    
-                try:
-                    os.remove(tessedit_image_path)
-                except Exception as e:
-                    st.warning(f"⚠️ Gagal hapus file tessedit image: {e}")
-                with open(f"{tess_output_txt}.txt", "r", encoding="utf-8") as f:
-                    ocr_result = f.read()
-            except subprocess.CalledProcessError:
-                st.error("❌ Gagal menjalankan Tesseract melalui CLI.")
-                st.stop()
+    # Gabungkan hasil menjadi satu string
+                ocr_result = ""
+                for line in ocr_result_raw[0]:
+                    text = line[1][0]
+                    ocr_result += text + "\n"
 
-            st.session_state["crop_image"] = Image.open(temp_path)
-            st.session_state["ocr_raw"] = ocr_result
-            st.session_state["nutrisi"] = ekstrak_nutrisi(ocr_result)
-            os.remove(temp_path)
-            os.remove(f"{tess_output_txt}.txt")
+                st.session_state["crop_image"] = Image.open(temp_path)
+                st.session_state["ocr_raw"] = ocr_result
+                st.session_state["nutrisi"] = ekstrak_nutrisi(ocr_result)
+                os.remove(temp_path)
 
         else:
             st.error("❌ Tidak ada tabel nutrisi terdeteksi oleh model.")
