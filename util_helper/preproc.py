@@ -58,13 +58,13 @@ def resize_img(img, target_char_height=31, draw_debug=False):
     return img
 
 def preproc_img(input_img):
-    resized_img = resize_img(input_img, 24)
-    alpha = 0.7
-    beta = 50
+    resized_img = resize_img(input_img, 30)
+    alpha = 1
+    beta = 0
     clahe_clip = 1.0
     tile_grid_size = (8, 8)
     blur_kernel = (3, 3)
-    denoise_h = 30
+    denoise_h = 0
     img = resized_img
 
     # === GRAYSCALE
