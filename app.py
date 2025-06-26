@@ -114,7 +114,7 @@ if uploaded_file:
                 with st.spinner("🔎 Menjalankan PaddleOCR..."):
                     ocr_raw = ocr.ocr(crop_bgr, cls=False)
                 ocr_cleaned = postproc_paddle(ocr_raw)
-                text_out = "\n".join([line[1][0] for line in ocr_cleaned[0]])
+                text_out = ocr_cleaned
                 st.session_state["crop_image"] = Image.open(temp_path)
                 st.session_state["ocr_raw"] = text_out
                 st.session_state["nutrisi"] = ekstrak_nutrisi(text_out)
