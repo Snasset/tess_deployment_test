@@ -219,14 +219,9 @@ def cek_kesehatan_bpom(kategori, nutrisi_dict):
 
     return hasil
 
-def postproc_paddle(paddle_result, y_thresh=10):
+def postproc_paddle(paddle_result, y_thresh=15, x_thresh=15):
     """
-    Gabungkan hasil PaddleOCR berdasarkan posisi y (vertikal) agar output menyerupai teks dalam baris.
-    Argumen:
-        paddle_result: hasil dari paddleocr.ocr(image)
-        y_thresh: toleransi perbedaan y agar dianggap satu baris
-    Return:
-        String hasil OCR yang sudah diformat ulang
+    Gabungkan hasil PaddleOCR berdasarkan posisi y dan x agar menyerupai struktur tabel.
     """
     if not paddle_result or not paddle_result[0]:
         return ""
@@ -235,22 +230,42 @@ def postproc_paddle(paddle_result, y_thresh=10):
     current_line = []
     prev_y = None
 
-    # Urutkan berdasarkan posisi y (atas ke bawah), lalu x (kiri ke kanan)
+    # Urutkan dari atas ke bawah
     sorted_results = sorted(paddle_result[0], key=lambda r: (r[0][0][1], r[0][0][0]))
 
     for box, (text, conf) in sorted_results:
         y = int(box[0][1])
-        if prev_y is None:
+        if prev_y is None or abs(y - prev_y) <= y_thresh:
+            current_line.append((box, text))
             prev_y = y
-        if abs(y - prev_y) > y_thresh:
-            # Baris baru
-            lines.append(" ".join([t[1] for t in current_line]))
-            current_line = []
+        else:
+            # Gabungkan line yang lama
+            lines.append(current_line)
+            current_line = [(box, text)]
             prev_y = y
-        current_line.append((box, text))
 
-    # Tambahkan baris terakhir
     if current_line:
-        lines.append(" ".join([t[1] for t in current_line]))
+        lines.append(current_line)
 
-    return "\n".join(lines)
+    # Sekarang: untuk setiap baris, urutkan X dan gabungkan token yang saling dekat
+    final_lines = []
+    for line in lines:
+        line_sorted = sorted(line, key=lambda r: r[0][0][0])  # sort by x
+        merged_line = []
+        prev_x = None
+        current_phrase = ""
+
+        for box, text in line_sorted:
+            x = int(box[0][0])
+            if prev_x is None or abs(x - prev_x) <= x_thresh:
+                current_phrase += " " + text
+            else:
+                merged_line.append(current_phrase.strip())
+                current_phrase = text
+            prev_x = x
+
+        if current_phrase:
+            merged_line.append(current_phrase.strip())
+        final_lines.append(" ".join(merged_line))
+
+    return "\n".join(final_lines)
