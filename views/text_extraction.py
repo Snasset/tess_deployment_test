@@ -33,7 +33,7 @@ st.markdown("""
 
     div.stButton > button:first-child:hover {
         background-color: #ffffff;  
-        color: white;
+        color: #61FF61;
     }
     </style>
 """, unsafe_allow_html=True)
