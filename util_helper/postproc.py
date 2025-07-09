@@ -30,13 +30,14 @@ def koreksi_teks(text):
 
 def ekstrak_nutrisi(text):
     nutrisi = {}
-    cleaned_text = text.lower().replace(",", ".")  
+    cleaned_text = text.lower().replace(",", ".")
+
     targets = {
         "Takaran Saji": [r"takaran saji", r"serving size"],
         "Energi": [r"energi(?:\s*total)?", r"calories?", r"energy"],
         "Lemak": [r"lemak(?:\s*total)?", r"fat(?:\s*total)?"],
         "Gula": [r"gula(?:\s*total)?", r"sugars?"],
-        "Serat": [r"serat(?:\s*total)?", r"fib(er|re)"],  
+        "Serat": [r"serat(?:\s*total)?", r"fib(?:er|re)"],
         "Garam": [r"garam(?:\s*total)?", r"salt", r"sodium"],
         "Protein": [r"protein"],
         "Karbohidrat": [r"karbohidrat(?:\s*total)?", r"carbohydrates?", r"carbs?"],
@@ -45,16 +46,16 @@ def ekstrak_nutrisi(text):
 
     for label, patterns in targets.items():
         for pattern in patterns:
-            match = re.search(
-                rf"{pattern}.*?(\d+\.?\d*)\s*(g|mg|ml|kkal|kcal)", 
-                cleaned_text, 
-                re.DOTALL
-            )
-            if match:  # Stop setelah ketemu match
-                val = float(match.group(1))
-                unit = match.group(2)
-                nutrisi[label] = f"{val} {unit}"
-                break 
+            # Ubah regex jadi lebih ketat: angka HARUS ada
+            match = re.search(rf"{pattern}[^0-9]*(\d+\.?\d*)\s*(g|mg|ml|kkal|kcal)", cleaned_text)
+            if match:
+                try:
+                    val = float(match.group(1))
+                    unit = match.group(2)
+                    nutrisi[label] = f"{val} {unit}"
+                    break
+                except ValueError:
+                    continue  # Skip kalau gagal convert ke float
 
     return nutrisi
 
