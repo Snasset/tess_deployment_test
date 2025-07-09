@@ -31,27 +31,30 @@ def koreksi_teks(text):
 def ekstrak_nutrisi(text):
     nutrisi = {}
     cleaned_text = text.lower().replace(",", ".")  
-
     targets = {
-        "Takaran Saji": [r"takaran saji"],
-        "Energi": [r"energi(?:\s*total)?"],
-        "Lemak": [r"lemak(?:\s*total)?"],
-        "Gula": [r"gula(?:\s*total)?"],
-        "Serat": [r"serat(?:\s*total)?"],
-        "Garam": [r"garam(?:\s*total)?"],
+        "Takaran Saji": [r"takaran saji", r"serving size"],
+        "Energi": [r"energi(?:\s*total)?", r"calories?", r"energy"],
+        "Lemak": [r"lemak(?:\s*total)?", r"fat(?:\s*total)?"],
+        "Gula": [r"gula(?:\s*total)?", r"sugars?"],
+        "Serat": [r"serat(?:\s*total)?", r"fib(er|re)"],  
+        "Garam": [r"garam(?:\s*total)?", r"salt", r"sodium"],
         "Protein": [r"protein"],
-        "Karbohidrat": [r"karbohidrat(?:\s*total)?"],
-        "Kalsium": [r"kalsium"]
+        "Karbohidrat": [r"karbohidrat(?:\s*total)?", r"carbohydrates?", r"carbs?"],
+        "Kalsium": [r"kalsium", r"calcium"]
     }
 
     for label, patterns in targets.items():
         for pattern in patterns:
-            match = re.search(rf"{pattern}.*?(\d+\.?\d*)\s*(g|mg|ml|kkal)", cleaned_text, re.DOTALL)
-            if match:
+            match = re.search(
+                rf"{pattern}.*?(\d+\.?\d*)\s*(g|mg|ml|kkal|kcal)", 
+                cleaned_text, 
+                re.DOTALL
+            )
+            if match:  # Stop setelah ketemu match
                 val = float(match.group(1))
                 unit = match.group(2)
                 nutrisi[label] = f"{val} {unit}"
-                break  # Stop jika sudah ketemu satu match
+                break 
 
     return nutrisi
 
