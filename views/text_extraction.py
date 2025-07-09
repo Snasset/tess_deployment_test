@@ -22,6 +22,22 @@ ocr = PaddleOCR(
 )
 
 # === STREAMLIT UI ===
+
+st.markdown("""
+    <style>
+    div.stButton > button:first-child {
+        background-color: #61FF61; 
+        color: white;
+        transition: background-color 0.3s ease;
+    }
+
+    div.stButton > button:first-child:hover {
+        background-color: #ffffff;  
+        color: white;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 st.title("Ekstraksi dan Evaluasi Informasi Nilai Gizi")
 st.subheader("📤 Upload Gambar Label Nutrisi")
 uploaded_file = st.file_uploader("Upload Gambar", type=["jpg", "jpeg", "png"], key="upload_gambar")
