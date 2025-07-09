@@ -13,7 +13,7 @@ info_page = st.Page(
 
 
 pg = st.navigation(pages=[main_page, info_page])
-st.logo("assets/title_logo.png", size="medium")
+st.logo("views/assets/title_logo.png")
 st.sidebar.text("Made by Snasset (Github)")
 
 pg.run()
